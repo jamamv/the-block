@@ -3,8 +3,8 @@ import { useAuctionStatus, type AuctionStatus } from '../../hooks/useAuctionStat
 const STYLES: Record<AuctionStatus, string> = {
   live: 'bg-red-500 text-white',
   'ending-soon': 'bg-orange-500 text-white',
-  upcoming: 'bg-blue-100 text-blue-700',
-  ended: 'bg-slate-100 text-slate-400',
+  upcoming: 'bg-white/90 text-blue-700',
+  ended: 'bg-black/50 text-white/70',
 };
 
 const LABELS: Record<AuctionStatus, string> = {
@@ -28,7 +28,7 @@ export function AuctionStatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold ${STYLES[status]}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${STYLES[status]}`}
     >
       {isActive && (
         <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse flex-shrink-0" />

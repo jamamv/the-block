@@ -52,7 +52,7 @@ function UserMenu({ user, onLogout }: { user: AuthUser; onLogout: () => void }) 
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 pl-2 border-l border-slate-200 focus:outline-none group"
       >
-        <span className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+        <span className="w-8 h-8 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0 ring-2 ring-blue-100">
           {initials}
         </span>
         <span className="text-sm text-slate-700 font-medium hidden sm:block truncate max-w-[100px] group-hover:text-slate-900 transition-colors">
@@ -111,8 +111,9 @@ function Header({
 
         <div className="flex items-center gap-3 relative">
           {hasLive && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500 text-white text-xs font-bold shadow-sm shadow-red-200">
+              <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping absolute" />
+              <span className="w-1.5 h-1.5 rounded-full bg-white relative" />
               Live Auction
             </span>
           )}

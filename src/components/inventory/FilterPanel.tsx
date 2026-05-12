@@ -139,7 +139,13 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
                 onClick={() => toggleAuctionStatus(status)}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${active ? cfg.active : cfg.inactive}`}
               >
-                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? 'bg-current opacity-80' : cfg.dot} ${cfg.pulse && !active ? 'animate-pulse' : ''}`} />
+                {active ? (
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot} ${cfg.pulse ? 'animate-pulse' : ''}`} />
+                )}
                 <span className="flex-1 text-left">{cfg.label}</span>
                 <span className={`text-xs tabular-nums ${active ? 'opacity-75' : 'opacity-60'}`}>
                   {counts.auctionStatuses[status] ?? 0}
@@ -169,9 +175,12 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
         {ALL_BrandS.length > BrandS_PREVIEW && (
           <button
             onClick={() => setShowAllBrands((v) => !v)}
-            className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
+            className="mt-2 flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-semibold transition-colors"
           >
-            {showAllBrands ? 'Show less' : `+ ${hiddenCount} more`}
+            <svg className={`w-3.5 h-3.5 transition-transform ${showAllBrands ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+            {showAllBrands ? 'Show less' : `${hiddenCount} more brands`}
           </button>
         )}
       </div>

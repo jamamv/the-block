@@ -76,7 +76,7 @@ export function InventoryPage({ bidStateMap }: InventoryPageProps) {
                 value={filters.search}
                 onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
                 placeholder="Search by Brand, model, VIN, lot…"
-                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
+                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
               />
             </div>
             {/* Filter toggle — hidden on lg+ where sidebar is always visible */}
