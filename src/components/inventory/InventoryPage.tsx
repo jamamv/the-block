@@ -42,42 +42,9 @@ export function InventoryPage({ bidStateMap }: InventoryPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Search + filter toggle row */}
-      <div className="mb-5 flex gap-3">
-        <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-            </svg>
-          </span>
-          <input
-            type="search"
-            value={filters.search}
-            onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-            placeholder="Search by Brand, model, VIN, lot…"
-            className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
-          />
-        </div>
-        {/* Filter toggle — hidden on md+ where sidebar is always visible */}
-        <button
-          onClick={() => setDrawerOpen(true)}
-          className="md:hidden flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 font-medium hover:bg-slate-50 transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
-          </svg>
-          Filters
-          {activeCount > 0 && (
-            <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">
-              {activeCount}
-            </span>
-          )}
-        </button>
-      </div>
-
       <div className="flex gap-6">
-        {/* Sidebar — visible md+ */}
-        <aside className="hidden md:block w-56 flex-shrink-0">
+        {/* Sidebar — visible lg+ (1024px+) so cards always have enough room */}
+        <aside className="hidden lg:block w-56 flex-shrink-0">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-slate-800">Filters</h2>
@@ -96,6 +63,39 @@ export function InventoryPage({ bidStateMap }: InventoryPageProps) {
 
         {/* Main content */}
         <div className="flex-1 min-w-0">
+          {/* Search + filter toggle — scoped to the grid column so it aligns with cards */}
+          <div className="mb-4 flex gap-3">
+            <div className="relative flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                </svg>
+              </span>
+              <input
+                type="search"
+                value={filters.search}
+                onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+                placeholder="Search by Brand, model, VIN, lot…"
+                className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
+              />
+            </div>
+            {/* Filter toggle — hidden on lg+ where sidebar is always visible */}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
+              </svg>
+              Filters
+              {activeCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  {activeCount}
+                </span>
+              )}
+            </button>
+          </div>
+
           <SortBar
             count={sorted.length}
             total={vehicles.length}
@@ -106,7 +106,7 @@ export function InventoryPage({ bidStateMap }: InventoryPageProps) {
           {sorted.length === 0 ? (
             <EmptyState onClear={handleClearFilters} />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
               {sorted.map((vehicle) => (
                 <VehicleCard
                   key={vehicle.id}
@@ -119,9 +119,9 @@ export function InventoryPage({ bidStateMap }: InventoryPageProps) {
         </div>
       </div>
 
-      {/* Mobile filter drawer */}
+      {/* Mobile/tablet filter drawer — shown below lg */}
       {drawerOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
+        <div className="fixed inset-0 z-40 lg:hidden">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
