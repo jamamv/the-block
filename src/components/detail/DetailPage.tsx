@@ -12,9 +12,10 @@ import { BidPanel } from './BidPanel.tsx';
 interface DetailPageProps {
   bidStateMap: BidStateMap;
   onPlaceBid: (vehicleId: string, amount: number) => void;
+  onBuyNow: (vehicleId: string, price: number) => void;
 }
 
-export function DetailPage({ bidStateMap, onPlaceBid }: DetailPageProps) {
+export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow }: DetailPageProps) {
   const { id } = useParams<{ id: string }>();
   const vehicle = id ? getVehicleById(id) : undefined;
 
@@ -111,6 +112,7 @@ export function DetailPage({ bidStateMap, onPlaceBid }: DetailPageProps) {
             vehicle={vehicle}
             bidState={bidState}
             onPlaceBid={onPlaceBid}
+            onBuyNow={onBuyNow}
           />
         </div>
       </div>

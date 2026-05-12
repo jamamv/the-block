@@ -33,10 +33,25 @@ export function useBidState() {
     });
   }, []);
 
+  const buyNow = useCallback((vehicleId: string, price: number) => {
+    setBidStateMap((prev) => {
+      const prevState = prev[vehicleId];
+      const updated: BidState = {
+        current_bid: price,
+        bid_count: (prevState?.bid_count ?? 0) + 1,
+        last_bid_at: new Date().toISOString(),
+        bought_now: true,
+      };
+      const next = { ...prev, [vehicleId]: updated };
+      saveBidStateMap(next);
+      return next;
+    });
+  }, []);
+
   const getBidState = useCallback(
     (vehicleId: string): BidState | undefined => bidStateMap[vehicleId],
     [bidStateMap],
   );
 
-  return { bidStateMap, placeBid, getBidState };
+  return { bidStateMap, placeBid, buyNow, getBidState };
 }

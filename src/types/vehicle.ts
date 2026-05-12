@@ -40,6 +40,7 @@ export interface BidState {
   current_bid: number;
   bid_count: number;
   last_bid_at: string;
+  bought_now?: boolean;
 }
 
 export type BidStateMap = Record<string, BidState>;

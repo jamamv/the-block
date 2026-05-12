@@ -50,7 +50,7 @@ function Header({ bidStateMap }: { bidStateMap: BidStateMap }) {
 }
 
 export default function App() {
-  const { bidStateMap, placeBid } = useBidState();
+  const { bidStateMap, placeBid, buyNow } = useBidState();
 
   return (
     <BrowserRouter>
@@ -65,7 +65,7 @@ export default function App() {
             <Route
               path="/vehicle/:id"
               element={
-                <DetailPage bidStateMap={bidStateMap} onPlaceBid={placeBid} />
+                <DetailPage bidStateMap={bidStateMap} onPlaceBid={placeBid} onBuyNow={buyNow} />
               }
             />
           </Routes>
