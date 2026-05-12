@@ -1,10 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { useBidState } from './hooks/useBidState.ts';
 import { InventoryPage } from './components/inventory/InventoryPage.tsx';
 import { DetailPage } from './components/detail/DetailPage.tsx';
 import { MyBidsPanel } from './components/ui/MyBidsPanel.tsx';
+import { vehicles } from './data/vehicles.ts';
+import { getNormalizedAuctionStart, getAuctionStatus } from './utils/auction.ts';
 import type { BidStateMap } from './types/vehicle.ts';
+
+function useHasLiveAuctions(): boolean {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return useMemo(
+    () => vehicles.some((v) => {
+      const s = getAuctionStatus(getNormalizedAuctionStart(v.auction_start), now);
+      return s === 'live' || s === 'ending-soon';
+    }),
+    [now],
+  );
+}
 
 function Header({
   bidStateMap,
@@ -14,6 +31,7 @@ function Header({
   onRetractBid: (id: string) => void;
 }) {
   const [panelOpen, setPanelOpen] = useState(false);
+  const hasLive = useHasLiveAuctions();
   const bidCount = Object.keys(bidStateMap).length;
 
   return (
@@ -28,10 +46,12 @@ function Header({
           </span>
         </Link>
         <div className="flex items-center gap-3 relative">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            Live Auction
-          </span>
+          {hasLive && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              Live Auction
+            </span>
+          )}
           <button
             onClick={() => setPanelOpen((v) => !v)}
             className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors text-sm font-medium text-slate-700"
