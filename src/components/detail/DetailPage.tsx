@@ -3,6 +3,7 @@ import type { BidStateMap } from '../../types/vehicle.ts';
 import { getVehicleById } from '../../data/vehicles.ts';
 import { formatCurrency, formatLot } from '../../utils/format.ts';
 import { TitleBadge, FuelBadge, ConditionBadge } from '../ui/Badge.tsx';
+import { AuctionStatusBadge } from '../ui/AuctionStatus.tsx';
 import { ImageGallery } from './ImageGallery.tsx';
 import { SpecsGrid } from './SpecsGrid.tsx';
 import { ConditionPanel } from './ConditionPanel.tsx';
@@ -53,6 +54,7 @@ export function DetailPage({ bidStateMap, onPlaceBid }: DetailPageProps) {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <AuctionStatusBadge auctionStart={vehicle.auction_start} />
           <TitleBadge status={vehicle.title_status} />
           <FuelBadge fuel={vehicle.fuel_type} />
           <ConditionBadge grade={vehicle.condition_grade} />

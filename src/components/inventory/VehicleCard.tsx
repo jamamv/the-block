@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import type { Vehicle, BidState } from '../../types/vehicle.ts';
 import { formatCurrency, formatOdometer, formatLot, conditionColor } from '../../utils/format.ts';
 import { TitleBadge, FuelBadge } from '../ui/Badge.tsx';
+import { AuctionStatusBadge } from '../ui/AuctionStatus.tsx';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -28,6 +29,9 @@ export function VehicleCard({ vehicle, bidState }: VehicleCardProps) {
         <div className="absolute top-2 left-2 flex flex-wrap gap-1">
           <TitleBadge status={vehicle.title_status} />
           <FuelBadge fuel={vehicle.fuel_type} />
+        </div>
+        <div className="absolute bottom-2 left-2">
+          <AuctionStatusBadge auctionStart={vehicle.auction_start} showCountdown={false} />
         </div>
         <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded">
           {formatLot(vehicle.lot)}
