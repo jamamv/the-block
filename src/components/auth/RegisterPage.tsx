@@ -20,6 +20,11 @@ export function RegisterPage({ onRegister }: RegisterPageProps) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (!name.trim()) { setError('Please enter your name.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError('Please enter a valid email address.'); return; }
+    if (password.length < 8) { setError('Password must be at least 8 characters.'); return; }
+
     setSubmitting(true);
     try {
       await onRegister(name.trim(), email.trim(), password);
@@ -40,7 +45,7 @@ export function RegisterPage({ onRegister }: RegisterPageProps) {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div>
               <label className="text-xs font-medium text-slate-600 block mb-1">Full name</label>
               <input
@@ -48,7 +53,6 @@ export function RegisterPage({ onRegister }: RegisterPageProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Jane Smith"
-                required
                 autoFocus
                 className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
               />
@@ -61,7 +65,6 @@ export function RegisterPage({ onRegister }: RegisterPageProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                required
                 className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
               />
             </div>
@@ -73,8 +76,6 @@ export function RegisterPage({ onRegister }: RegisterPageProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Min. 8 characters"
-                required
-                minLength={8}
                 className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
               />
             </div>

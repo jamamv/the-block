@@ -19,6 +19,10 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (!email.trim()) { setError('Please enter your email address.'); return; }
+    if (!password) { setError('Please enter your password.'); return; }
+
     setSubmitting(true);
     try {
       await onLogin(email.trim(), password);
@@ -39,7 +43,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div>
               <label className="text-xs font-medium text-slate-600 block mb-1">Email address</label>
               <input
@@ -47,7 +51,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                required
                 autoFocus
                 className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
               />
