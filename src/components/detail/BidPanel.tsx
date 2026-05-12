@@ -124,27 +124,27 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow }: BidPanelPr
         <form onSubmit={handleBidSubmit} className="space-y-3">
           <div>
             <label className="text-xs font-medium text-slate-600 block mb-1">
-              Your bid (min. {formatCurrency(minBid)})
+              Your bid
             </label>
-            <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-              <span className="pl-3 text-slate-500 text-sm">$</span>
+            <div className={`flex items-center border rounded-lg overflow-hidden transition-colors ${bidStep === 'error' ? 'border-red-400 ring-1 ring-red-400' : 'border-slate-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500'}`}>
+              <span className="pl-3 text-slate-400 text-sm font-medium select-none">$</span>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9,]*"
                 value={inputValue}
                 onChange={(e) => {
                   setInputValue(e.target.value);
                   setBidStep('idle');
                   setErrorMsg('');
                 }}
-                min={minBid}
-                step={500}
-                placeholder={minBid.toString()}
-                className="flex-1 px-2 py-2.5 text-sm outline-none bg-transparent"
+                placeholder={minBid.toLocaleString('en-CA')}
+                className="flex-1 px-2 py-2.5 text-sm outline-none bg-transparent placeholder:text-slate-300 placeholder:font-normal"
               />
             </div>
-            {bidStep === 'error' && (
-              <p className="text-xs text-red-600 mt-1">{errorMsg}</p>
-            )}
+            <p className={`text-xs mt-1 ${bidStep === 'error' ? 'text-red-600' : 'text-slate-400'}`}>
+              {bidStep === 'error' ? errorMsg : `Min. ${formatCurrency(minBid)} · $500 increments`}
+            </p>
           </div>
           <button
             type="submit"

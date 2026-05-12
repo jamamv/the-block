@@ -62,8 +62,8 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow }: DetailPageProp
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-6">
           <ImageGallery images={vehicle.images} alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`} />
 
           <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
@@ -107,7 +107,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow }: DetailPageProp
           </section>
         </div>
 
-        <div className="lg:sticky lg:top-6 lg:self-start">
+        <div className="md:sticky md:top-20 md:self-start">
           <BidPanel
             vehicle={vehicle}
             bidState={bidState}

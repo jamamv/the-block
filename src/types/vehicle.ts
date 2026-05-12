@@ -45,8 +45,11 @@ export interface BidState {
 
 export type BidStateMap = Record<string, BidState>;
 
+export type AuctionStatusFilter = 'live' | 'ending-soon' | 'upcoming' | 'ended';
+
 export interface FilterState {
   search: string;
+  auctionStatuses: AuctionStatusFilter[];
   makes: string[];
   bodyStyles: BodyStyle[];
   titleStatuses: TitleStatus[];
