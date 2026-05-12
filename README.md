@@ -39,24 +39,36 @@ npm run preview
 
 ## What I Built
 
-A responsive web app covering the full buyer journey: browsing 200 vehicles, inspecting details, and placing bids.
+A responsive web app covering the full buyer journey: browsing 200 vehicles, inspecting details, placing bids, and tracking active bids.
 
 **Inventory page**
 - Search across make, model, VIN, and lot number
 - Filter sidebar: make (15), body style, title status, province (7)
 - Sort by current bid, year, odometer, or condition grade
 - Responsive card grid with condition bar, bid count, and reserve status
+- Live auction status badges (Live / Ending Soon / Upcoming / Ended) on every card
 
 **Detail page**
 - 4-photo image carousel with thumbnail strip
 - Full specs grid and condition panel with damage notes
 - Sticky bid panel: validates increment, shows reserve and buy-now price, dealer info
+- Auction countdown timer (live-normalized relative to "now")
 - Breadcrumb navigation back to inventory
 
 **Bidding**
 - Minimum increment of $500 enforced with inline validation
+- Confirmation step before a bid is submitted — prevents accidental bids
 - Bid state persisted to `localStorage` — bids survive a page refresh
 - Bid count and current bid update immediately on the card and detail panel
+
+**Buy Now**
+- Vehicles with a buy-now price show a dedicated Buy Now button
+- Confirmation step before purchase locks in the price
+
+**My Bids**
+- Header badge shows active bid count at a glance
+- Dropdown panel lists every vehicle you've bid on with current bid, reserve status, and auction countdown
+- Direct link to each vehicle detail page
 
 ---
 
@@ -71,6 +83,8 @@ A responsive web app covering the full buyer journey: browsing 200 vehicles, ins
 **Tailwind v4 with the Vite plugin.** The `@tailwindcss/vite` plugin means no `tailwind.config.js` to maintain — CSS is generated from usage at build time. Slightly newer approach but cleaner for a greenfield project.
 
 **LocalStorage for persistence.** Keeps the prototype self-contained. The `useBidState` hook wraps reads/writes so swapping in a real API later is a one-file change.
+
+**Bid and Buy Now confirmation.** Both actions require a confirmation step before committing. In an auction context, an accidental bid is hard to undo — a one-step confirmation costs almost nothing and meaningfully increases trust.
 
 **TypeScript strict mode.** `noUnusedLocals`, `noUnusedParameters`, and `verbatimModuleSyntax` are all on. A bit more upfront discipline but the codebase stays clean as it grows.
 
@@ -99,9 +113,8 @@ Approximately 5–6 hours, within the suggested 4–8 hour window.
 
 ## What I'd Do With More Time
 
-- **Auction countdown timers** — normalize the synthetic timestamps to show live countdowns on cards and the detail page
-- **"My Bids" tracker** — a header panel listing the vehicles you've bid on, with current status
 - **Price range filter** — min/max bid slider to complement the existing filters
 - **Skeleton loading states** — replace blank grid gaps during initial render
 - **Keyboard navigation** in the image gallery
 - **Accessibility audit** — ARIA labels are minimal; a production build would need a proper pass
+- **Outbid notifications** — toast when another buyer surpasses your bid (would need a polling layer or websocket)
