@@ -8,10 +8,10 @@ interface SpecsGridProps {
 export function SpecsGrid({ vehicle }: SpecsGridProps) {
   const specs = [
     { label: 'Year', value: vehicle.year },
-    { label: 'Make', value: vehicle.make },
+    { label: 'Brand', value: vehicle.Brand },
     { label: 'Model', value: vehicle.model },
     { label: 'Trim', value: vehicle.trim },
-    { label: 'Body Style', value: bodyStyleLabel(vehicle.body_style) },
+    { label: 'Type', value: bodyStyleLabel(vehicle.body_style) },
     { label: 'Engine', value: vehicle.engine },
     { label: 'Transmission', value: vehicle.transmission },
     { label: 'Drivetrain', value: vehicle.drivetrain },

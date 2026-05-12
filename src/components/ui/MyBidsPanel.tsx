@@ -51,7 +51,7 @@ function BidRow({
         />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-slate-900 truncate">
-            {vehicle.year} {vehicle.make} {vehicle.model}
+            {vehicle.year} {vehicle.Brand} {vehicle.model}
           </p>
           <p className={`text-xs ${statusColor}`}>{countdown}</p>
         </div>

@@ -27,7 +27,7 @@ const PROVINCE_WEIGHTS = {
   "New Brunswick": 2,
 };
 
-const MAKES_MODELS = {
+const BrandS_MODELS = {
   Toyota: {
     Camry: { body: "sedan", engines: ["2.5L I4", "2.5L Hybrid I4", "3.5L V6"], trims: ["LE", "SE", "XLE", "XSE", "TRD"] },
     RAV4: { body: "SUV", engines: ["2.5L I4", "2.5L Hybrid I4"], trims: ["LE", "XLE", "XLE Premium", "Adventure", "TRD Off-Road"] },
@@ -308,12 +308,12 @@ function getTransmission(engine, model, bodyStyle) {
   return choice(["automatic", "automatic", "automatic", "CVT"]);
 }
 
-function getDrivetrain(make, model, bodyStyle) {
-  if (make === "Tesla") {
+function getDrivetrain(Brand, model, bodyStyle) {
+  if (Brand === "Tesla") {
     return choice(["AWD", "RWD"]);
   }
 
-  if (make === "Subaru") {
+  if (Brand === "Subaru") {
     return "AWD";
   }
 
@@ -325,7 +325,7 @@ function getDrivetrain(make, model, bodyStyle) {
     return "4WD";
   }
 
-  if (make === "BMW") {
+  if (Brand === "BMW") {
     return choice(["AWD", "RWD"]);
   }
 
@@ -371,20 +371,20 @@ function generateCondition(year, odometerKm, titleStatus) {
   };
 }
 
-function estimatePrice(year, make, model, odometerKm, conditionGrade, titleStatus) {
+function estimatePrice(year, Brand, model, odometerKm, conditionGrade, titleStatus) {
   const premiumTrucks = ["F-150", "Silverado 1500", "Sierra 1500", "1500", "Tundra"];
   const midTrucks = ["Tacoma"];
   const premiumSuvs = ["X5", "Grand Cherokee", "Telluride", "Highlander", "Pilot", "Explorer"];
   const compactSuvs = ["CR-V", "RAV4", "Tucson", "Sportage", "Equinox", "Escape", "CX-5", "Crosstrek", "Rogue", "Tiguan", "Terrain", "Bronco"];
   let base = randInt(25000, 40000);
 
-  if (make === "Tesla" && model === "Model S") {
+  if (Brand === "Tesla" && model === "Model S") {
     base = randInt(85000, 120000);
-  } else if (make === "Tesla") {
+  } else if (Brand === "Tesla") {
     base = randInt(50000, 75000);
-  } else if (make === "BMW" && ["X5", "5 Series"].includes(model)) {
+  } else if (Brand === "BMW" && ["X5", "5 Series"].includes(model)) {
     base = randInt(65000, 95000);
-  } else if (make === "BMW") {
+  } else if (Brand === "BMW") {
     base = randInt(48000, 70000);
   } else if (premiumTrucks.includes(model)) {
     base = randInt(50000, 80000);
@@ -494,16 +494,16 @@ function lotNumberForIndex(index) {
 }
 
 function generateVehicle(index) {
-  const make = choice(Object.keys(MAKES_MODELS));
-  const model = choice(Object.keys(MAKES_MODELS[make]));
-  const info = MAKES_MODELS[make][model];
+  const Brand = choice(Object.keys(BrandS_MODELS));
+  const model = choice(Object.keys(BrandS_MODELS[Brand]));
+  const info = BrandS_MODELS[Brand][model];
   const year = randInt(CURRENT_YEAR - 10, CURRENT_YEAR);
   const trim = choice(info.trims);
   const engine = choice(info.engines);
   const bodyStyle = info.body;
   const fuelType = getFuelType(engine);
   const transmission = getTransmission(engine, model, bodyStyle);
-  const drivetrain = getDrivetrain(make, model, bodyStyle);
+  const drivetrain = getDrivetrain(Brand, model, bodyStyle);
 
   let odometerKm = Math.max(
     500,
@@ -517,7 +517,7 @@ function generateVehicle(index) {
   const titleStatus = titleRoll < 0.08 ? "salvage" : titleRoll < 0.15 ? "rebuilt" : "clean";
   const { conditionGrade, conditionReport, damageNotes } = generateCondition(year, odometerKm, titleStatus);
   const { province, city } = pickProvinceAndCity();
-  const { startingBid, reservePrice, buyNowPrice } = estimatePrice(year, make, model, odometerKm, conditionGrade, titleStatus);
+  const { startingBid, reservePrice, buyNowPrice } = estimatePrice(year, Brand, model, odometerKm, conditionGrade, titleStatus);
   const { currentBid, bidCount } = generateBidState(startingBid, reservePrice, buyNowPrice);
   const imageCount = randInt(3, 6);
 
@@ -525,7 +525,7 @@ function generateVehicle(index) {
     id: crypto.randomUUID(),
     vin: generateVin(),
     year,
-    make,
+    Brand,
     model,
     trim,
     body_style: bodyStyle,
@@ -547,7 +547,7 @@ function generateVehicle(index) {
     reserve_price: reservePrice,
     buy_now_price: buyNowPrice,
     images: Array.from({ length: imageCount }, (_, imageIndex) => (
-      `https://placehold.co/800x600/1a1a2e/eaeaea?text=${year}+${make.replaceAll(" ", "+")}+${model.replaceAll(" ", "+")}+Photo+${imageIndex + 1}`
+      `https://placehold.co/800x600/1a1a2e/eaeaea?text=${year}+${Brand.replaceAll(" ", "+")}+${model.replaceAll(" ", "+")}+Photo+${imageIndex + 1}`
     )),
     selling_dealership: choice(DEALERSHIPS_BY_PROVINCE[province]),
     lot: lotNumberForIndex(index),

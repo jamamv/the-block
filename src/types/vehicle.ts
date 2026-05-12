@@ -8,7 +8,7 @@ export interface Vehicle {
   id: string;
   vin: string;
   year: number;
-  make: string;
+  Brand: string;
   model: string;
   trim: string;
   body_style: BodyStyle;
@@ -50,7 +50,7 @@ export type AuctionStatusFilter = 'live' | 'ending-soon' | 'upcoming' | 'ended';
 export interface FilterState {
   search: string;
   auctionStatuses: AuctionStatusFilter[];
-  makes: string[];
+  Brands: string[];
   bodyStyles: BodyStyle[];
   titleStatuses: TitleStatus[];
   provinces: string[];

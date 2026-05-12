@@ -6,7 +6,7 @@ export const vehicles: Vehicle[] = (rawVehicles as Vehicle[]).map((v) => ({
   body_style: v.body_style.toLowerCase() as BodyStyle,
 }));
 
-export const ALL_MAKES: string[] = [...new Set(vehicles.map((v) => v.make))].sort();
+export const ALL_BrandS: string[] = [...new Set(vehicles.map((v) => v.Brand))].sort();
 
 export const ALL_PROVINCES: string[] = [...new Set(vehicles.map((v) => v.province))].sort();
 

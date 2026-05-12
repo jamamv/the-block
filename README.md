@@ -12,10 +12,17 @@ A buyer-side vehicle auction prototype built for the OPENLANE coding challenge.
 git clone https://github.com/jamamv/the-block.git
 cd the-block
 npm install
-npm run dev
+npm run dev:full
 ```
 
-Open [http://localhost:5173](http://localhost:5173). The app runs entirely in the browser — no backend, no environment variables needed.
+This starts both the Vite dev server (port 5173) and the Express API server (port 3001) concurrently. Open [http://localhost:5173](http://localhost:5173).
+
+To run them separately:
+
+```bash
+npm run dev     # frontend only
+npm run server  # API server only
+```
 
 To build for production:
 
@@ -34,6 +41,7 @@ npm run preview
 - **Routing:** React Router v7
 - **State:** React `useState` + `useMemo` — no external state library
 - **Persistence:** `localStorage` for bid state across sessions
+- **Auth:** Node.js + Express API, bcrypt password hashing, JWT tokens, SQLite user store
 
 ---
 
@@ -42,8 +50,8 @@ npm run preview
 A responsive web app covering the full buyer journey: browsing 200 vehicles, inspecting details, placing bids, and tracking active bids.
 
 **Inventory page**
-- Search across make, model, VIN, and lot number
-- Filter sidebar: make (15), body style, title status, province (7)
+- Search across Brand, model, VIN, and lot number
+- Filter sidebar: Brand (15), Type, title status, province (7)
 - Sort by current bid, year, odometer, or condition grade
 - Responsive card grid with condition bar, bid count, and reserve status
 - Live auction status badges (Live / Ending Soon / Upcoming / Ended) on every card
@@ -70,6 +78,12 @@ A responsive web app covering the full buyer journey: browsing 200 vehicles, ins
 - Dropdown panel lists every vehicle you've bid on with current bid, reserve status, and auction countdown
 - Direct link to each vehicle detail page
 
+**Authentication**
+- Register with name, email, and password (bcrypt-hashed, stored in SQLite)
+- JWT tokens issued on login/register, verified on protected API routes
+- Bid and Buy Now actions are gated — unauthenticated users see a sign-in prompt with a return-URL redirect
+- Session persists across page refreshes via localStorage token
+
 ---
 
 ## Notable Decisions
@@ -85,6 +99,8 @@ A responsive web app covering the full buyer journey: browsing 200 vehicles, ins
 **LocalStorage for persistence.** Keeps the prototype self-contained. The `useBidState` hook wraps reads/writes so swapping in a real API later is a one-file change.
 
 **Bid and Buy Now confirmation.** Both actions require a confirmation step before committing. In an auction context, an accidental bid is hard to undo — a one-step confirmation costs almost nothing and meaningfully increases trust.
+
+**Auth gating on bidding, not browsing.** Anyone can browse inventory and inspect vehicles without an account. Creating an account is only required when you want to place a bid or buy now. This is deliberate — friction at the browse stage costs conversions; friction at the transaction stage is appropriate and expected.
 
 **TypeScript strict mode.** `noUnusedLocals`, `noUnusedParameters`, and `verbatimModuleSyntax` are all on. A bit more upfront discipline but the codebase stays clean as it grows.
 

@@ -34,7 +34,7 @@ A brief description of your project and your approach.
 
 ## Notable Decisions
 
-What choices did you make and why? What tradeoffs did you consider?
+What choices did you Brand and why? What tradeoffs did you consider?
 
 ## Testing
 

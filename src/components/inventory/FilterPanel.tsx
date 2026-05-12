@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { FilterState, BodyStyle, TitleStatus, AuctionStatusFilter } from '../../types/vehicle.ts';
-import { ALL_MAKES, ALL_PROVINCES, ALL_BODY_STYLES, vehicles } from '../../data/vehicles.ts';
+import { ALL_BrandS, ALL_PROVINCES, ALL_BODY_STYLES, vehicles } from '../../data/vehicles.ts';
 import { bodyStyleLabel, titleStatusLabel } from '../../utils/format.ts';
 import { computeFilterCounts } from '../../utils/filter.ts';
 
@@ -9,7 +9,7 @@ interface FilterPanelProps {
   onChange: (filters: FilterState) => void;
 }
 
-const MAKES_PREVIEW = 6;
+const BrandS_PREVIEW = 6;
 const TITLE_STATUSES: TitleStatus[] = ['clean', 'rebuilt', 'salvage'];
 const AUCTION_STATUSES: AuctionStatusFilter[] = ['live', 'ending-soon', 'upcoming', 'ended'];
 
@@ -86,12 +86,12 @@ function CheckRow({
 }
 
 export function FilterPanel({ filters, onChange }: FilterPanelProps) {
-  const [showAllMakes, setShowAllMakes] = useState(false);
+  const [showAllBrands, setShowAllBrands] = useState(false);
 
   const counts = useMemo(() => computeFilterCounts(vehicles), []);
 
-  const visibleMakes = showAllMakes ? ALL_MAKES : ALL_MAKES.slice(0, MAKES_PREVIEW);
-  const hiddenCount = ALL_MAKES.length - MAKES_PREVIEW;
+  const visibleBrands = showAllBrands ? ALL_BrandS : ALL_BrandS.slice(0, BrandS_PREVIEW);
+  const hiddenCount = ALL_BrandS.length - BrandS_PREVIEW;
 
   function toggleAuctionStatus(status: AuctionStatusFilter) {
     const curr = filters.auctionStatuses;
@@ -103,9 +103,9 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
     });
   }
 
-  function toggleMake(make: string) {
-    const curr = filters.makes;
-    onChange({ ...filters, makes: curr.includes(make) ? curr.filter((m) => m !== make) : [...curr, make] });
+  function toggleBrand(Brand: string) {
+    const curr = filters.Brands;
+    onChange({ ...filters, Brands: curr.includes(Brand) ? curr.filter((m) => m !== Brand) : [...curr, Brand] });
   }
 
   function toggleBodyStyle(style: BodyStyle) {
@@ -152,35 +152,35 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       <div className="border-t border-slate-100" />
 
-      {/* Make */}
+      {/* Brand */}
       <div>
-        <SectionHeader title="Make" />
+        <SectionHeader title="Brand" />
         <div className="space-y-0.5">
-          {visibleMakes.map((make) => (
+          {visibleBrands.map((Brand) => (
             <CheckRow
-              key={make}
-              label={make}
-              count={counts.makes[make] ?? 0}
-              checked={filters.makes.includes(make)}
-              onChange={() => toggleMake(make)}
+              key={Brand}
+              label={Brand}
+              count={counts.Brands[Brand] ?? 0}
+              checked={filters.Brands.includes(Brand)}
+              onChange={() => toggleBrand(Brand)}
             />
           ))}
         </div>
-        {ALL_MAKES.length > MAKES_PREVIEW && (
+        {ALL_BrandS.length > BrandS_PREVIEW && (
           <button
-            onClick={() => setShowAllMakes((v) => !v)}
+            onClick={() => setShowAllBrands((v) => !v)}
             className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
           >
-            {showAllMakes ? 'Show less' : `+ ${hiddenCount} more`}
+            {showAllBrands ? 'Show less' : `+ ${hiddenCount} more`}
           </button>
         )}
       </div>
 
       <div className="border-t border-slate-100" />
 
-      {/* Body Style */}
+      {/* Type */}
       <div>
-        <SectionHeader title="Body Style" />
+        <SectionHeader title="Type" />
         <div className="space-y-0.5">
           {ALL_BODY_STYLES.map((style) => (
             <CheckRow

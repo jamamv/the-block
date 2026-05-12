@@ -35,7 +35,7 @@ export function InventoryPage({ bidStateMap }: InventoryPageProps) {
   const filterActive = isFilterActive(filters);
   const activeCount =
     filters.auctionStatuses.length +
-    filters.makes.length +
+    filters.Brands.length +
     filters.bodyStyles.length +
     filters.titleStatuses.length +
     filters.provinces.length;
@@ -54,7 +54,7 @@ export function InventoryPage({ bidStateMap }: InventoryPageProps) {
             type="search"
             value={filters.search}
             onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-            placeholder="Search by make, model, VIN, lot…"
+            placeholder="Search by Brand, model, VIN, lot…"
             className="w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-slate-300"
           />
         </div>

@@ -1,5 +1,6 @@
 import { useParams, Link } from 'react-router-dom';
 import type { BidStateMap } from '../../types/vehicle.ts';
+import type { AuthUser } from '../../hooks/useAuth.ts';
 import { getVehicleById } from '../../data/vehicles.ts';
 import { formatCurrency, formatLot } from '../../utils/format.ts';
 import { TitleBadge, FuelBadge, ConditionBadge } from '../ui/Badge.tsx';
@@ -14,9 +15,10 @@ interface DetailPageProps {
   onPlaceBid: (vehicleId: string, amount: number) => void;
   onBuyNow: (vehicleId: string, price: number) => void;
   onRetractBid: (vehicleId: string) => void;
+  user: AuthUser | null;
 }
 
-export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid }: DetailPageProps) {
+export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, user }: DetailPageProps) {
   const { id } = useParams<{ id: string }>();
   const vehicle = id ? getVehicleById(id) : undefined;
 
@@ -41,14 +43,14 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid }: 
         </Link>
         <span>/</span>
         <span className="text-slate-800 font-medium truncate">
-          {vehicle.make} {vehicle.model} ({vehicle.year})
+          {vehicle.Brand} {vehicle.model} ({vehicle.year})
         </span>
       </nav>
 
       <div className="flex items-start justify-between mb-4 gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            {vehicle.make} {vehicle.model} {vehicle.trim}{' '}
+            {vehicle.Brand} {vehicle.model} {vehicle.trim}{' '}
             <span className="text-slate-400">({vehicle.year})</span>
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -65,7 +67,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid }: 
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <ImageGallery images={vehicle.images} alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`} />
+          <ImageGallery images={vehicle.images} alt={`${vehicle.year} ${vehicle.Brand} ${vehicle.model}`} />
 
           <section className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
             <h2 className="text-base font-semibold text-slate-900 mb-4">Specifications</h2>
@@ -115,6 +117,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid }: 
             onPlaceBid={onPlaceBid}
             onBuyNow={onBuyNow}
             onRetractBid={onRetractBid}
+            user={user}
           />
         </div>
       </div>

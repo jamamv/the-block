@@ -22,7 +22,7 @@ export function VehicleCard({ vehicle, bidState }: VehicleCardProps) {
       <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
         <img
           src={vehicle.images[0]}
-          alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+          alt={`${vehicle.year} ${vehicle.Brand} ${vehicle.model}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           loading="lazy"
         />
@@ -41,7 +41,7 @@ export function VehicleCard({ vehicle, bidState }: VehicleCardProps) {
       <div className="p-4 flex flex-col flex-1 gap-3">
         <div>
           <h3 className="font-semibold text-slate-900 text-sm leading-snug group-hover:text-blue-700 transition-colors">
-            {vehicle.make} {vehicle.model} <span className="text-slate-400">({vehicle.year})</span>
+            {vehicle.Brand} {vehicle.model} <span className="text-slate-400">({vehicle.year})</span>
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">{vehicle.trim} · {formatOdometer(vehicle.odometer_km)}</p>
         </div>
