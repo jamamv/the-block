@@ -6,7 +6,13 @@ import { DetailPage } from './components/detail/DetailPage.tsx';
 import { MyBidsPanel } from './components/ui/MyBidsPanel.tsx';
 import type { BidStateMap } from './types/vehicle.ts';
 
-function Header({ bidStateMap }: { bidStateMap: BidStateMap }) {
+function Header({
+  bidStateMap,
+  onRetractBid,
+}: {
+  bidStateMap: BidStateMap;
+  onRetractBid: (id: string) => void;
+}) {
   const [panelOpen, setPanelOpen] = useState(false);
   const bidCount = Object.keys(bidStateMap).length;
 
@@ -41,6 +47,7 @@ function Header({ bidStateMap }: { bidStateMap: BidStateMap }) {
             <MyBidsPanel
               bidStateMap={bidStateMap}
               onClose={() => setPanelOpen(false)}
+              onRetractBid={onRetractBid}
             />
           )}
         </div>
@@ -50,12 +57,12 @@ function Header({ bidStateMap }: { bidStateMap: BidStateMap }) {
 }
 
 export default function App() {
-  const { bidStateMap, placeBid, buyNow } = useBidState();
+  const { bidStateMap, placeBid, buyNow, retractBid } = useBidState();
 
   return (
     <BrowserRouter>
       <div className="min-h-screen flex flex-col">
-        <Header bidStateMap={bidStateMap} />
+        <Header bidStateMap={bidStateMap} onRetractBid={retractBid} />
         <main className="flex-1">
           <Routes>
             <Route
@@ -65,7 +72,12 @@ export default function App() {
             <Route
               path="/vehicle/:id"
               element={
-                <DetailPage bidStateMap={bidStateMap} onPlaceBid={placeBid} onBuyNow={buyNow} />
+                <DetailPage
+                  bidStateMap={bidStateMap}
+                  onPlaceBid={placeBid}
+                  onBuyNow={buyNow}
+                  onRetractBid={retractBid}
+                />
               }
             />
           </Routes>

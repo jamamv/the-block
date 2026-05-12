@@ -48,10 +48,19 @@ export function useBidState() {
     });
   }, []);
 
+  const retractBid = useCallback((vehicleId: string) => {
+    setBidStateMap((prev) => {
+      const next = { ...prev };
+      delete next[vehicleId];
+      saveBidStateMap(next);
+      return next;
+    });
+  }, []);
+
   const getBidState = useCallback(
     (vehicleId: string): BidState | undefined => bidStateMap[vehicleId],
     [bidStateMap],
   );
 
-  return { bidStateMap, placeBid, buyNow, getBidState };
+  return { bidStateMap, placeBid, buyNow, retractBid, getBidState };
 }

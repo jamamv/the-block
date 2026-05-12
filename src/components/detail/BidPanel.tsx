@@ -9,12 +9,13 @@ interface BidPanelProps {
   bidState?: BidState;
   onPlaceBid: (vehicleId: string, amount: number) => void;
   onBuyNow: (vehicleId: string, price: number) => void;
+  onRetractBid: (vehicleId: string) => void;
 }
 
 type BidStep = 'idle' | 'confirm' | 'success' | 'error';
 type BuyNowStep = 'idle' | 'confirm' | 'success';
 
-export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow }: BidPanelProps) {
+export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid }: BidPanelProps) {
   const boughtNow = bidState?.bought_now === true;
   const currentBid = bidState?.current_bid ?? vehicle.current_bid;
   const bidCount = bidState?.bid_count ?? vehicle.bid_count;
@@ -26,6 +27,7 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow }: BidPanelPr
   const [errorMsg, setErrorMsg] = useState('');
 
   const [buyNowStep, setBuyNowStep] = useState<BuyNowStep>('idle');
+  const [retractConfirm, setRetractConfirm] = useState(false);
 
   const minBid = minimumBid(currentBid);
 
@@ -199,6 +201,37 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow }: BidPanelPr
         <p className="text-sm font-semibold text-slate-800">{vehicle.selling_dealership}</p>
         <p className="text-xs text-slate-500">{vehicle.city}, {vehicle.province}</p>
       </div>
+
+      {bidState && !boughtNow && (
+        <div className="pt-1">
+          {retractConfirm ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 space-y-2">
+              <p className="text-xs text-red-800 font-medium">Retract your bid of {formatCurrency(bidState.current_bid)}?</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { onRetractBid(vehicle.id); setRetractConfirm(false); }}
+                  className="flex-1 py-1.5 rounded-md bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors"
+                >
+                  Yes, retract
+                </button>
+                <button
+                  onClick={() => setRetractConfirm(false)}
+                  className="flex-1 py-1.5 rounded-md border border-slate-300 text-slate-600 text-xs font-semibold hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setRetractConfirm(true)}
+              className="w-full text-xs text-slate-400 hover:text-red-500 transition-colors py-1"
+            >
+              Retract my bid
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

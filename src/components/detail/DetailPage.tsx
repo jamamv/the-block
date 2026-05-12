@@ -13,9 +13,10 @@ interface DetailPageProps {
   bidStateMap: BidStateMap;
   onPlaceBid: (vehicleId: string, amount: number) => void;
   onBuyNow: (vehicleId: string, price: number) => void;
+  onRetractBid: (vehicleId: string) => void;
 }
 
-export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow }: DetailPageProps) {
+export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid }: DetailPageProps) {
   const { id } = useParams<{ id: string }>();
   const vehicle = id ? getVehicleById(id) : undefined;
 
@@ -113,6 +114,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow }: DetailPageProp
             bidState={bidState}
             onPlaceBid={onPlaceBid}
             onBuyNow={onBuyNow}
+            onRetractBid={onRetractBid}
           />
         </div>
       </div>
