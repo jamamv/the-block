@@ -47,7 +47,7 @@ export function ConditionBadge({ grade }: { grade: number }) {
   else if (grade >= 3.5) style = 'bg-blue-100 text-blue-700';
   else if (grade >= 2.5) style = 'bg-amber-100 text-amber-700';
   else style = 'bg-red-100 text-red-700';
-  return <Badge className={style}>{grade.toFixed(1)}</Badge>;
+  return <Badge className={style}>Grade {grade.toFixed(1)}</Badge>;
 }
 
 export function ReserveBadge({ met }: { met: boolean }) {

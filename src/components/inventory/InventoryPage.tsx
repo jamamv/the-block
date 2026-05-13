@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { FilterState, SortKey, BidStateMap } from '../../types/vehicle.ts';
 import { vehicles } from '../../data/vehicles.ts';
 import { filterVehicles, isFilterActive, DEFAULT_FILTERS } from '../../utils/filter.ts';
@@ -9,6 +10,7 @@ import { VehicleCard } from './VehicleCard.tsx';
 import { EmptyState } from '../ui/EmptyState.tsx';
 import { CompareDrawer } from '../ui/CompareDrawer.tsx';
 import { useComparison } from '../../hooks/useComparison.ts';
+import { SearchSuggestions } from './SearchSuggestions.tsx';
 
 interface InventoryPageProps {
   bidStateMap: BidStateMap;
@@ -17,11 +19,16 @@ interface InventoryPageProps {
 }
 
 export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: InventoryPageProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Derived directly from URL so nav toggles stay in sync without remounting
+  const watchlistOnly = searchParams.get('saved') === '1';
+
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [sortKey, setSortKey] = useState<SortKey>('bid_desc');
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [watchlistOnly, setWatchlistOnly] = useState(false);
   const [searchConfirmed, setSearchConfirmed] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [heroDismissed, setHeroDismissed] = useState(() => sessionStorage.getItem('hero-dismissed') === '1');
   const { compareIds, toggleCompare, removeCompare, clearCompare, canAdd } = useComparison();
 
   function handleSearchEnter(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -40,29 +47,48 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
 
   function handleClearFilters() {
     setFilters(DEFAULT_FILTERS);
-    setWatchlistOnly(false);
     setDrawerOpen(false);
+    if (watchlistOnly) setSearchParams({}, { replace: true });
   }
 
-  const filterActive = isFilterActive(filters) || watchlistOnly;
+  const filterActive = isFilterActive(filters);
   const activeCount =
     filters.auctionStatuses.length +
     filters.Brands.length +
     filters.bodyStyles.length +
     filters.titleStatuses.length +
-    filters.provinces.length +
-    (watchlistOnly ? 1 : 0);
+    filters.provinces.length;
 
   const filterPanelProps = {
     filters,
     onChange: setFilters,
-    watchlistOnly,
-    watchlistCount: watchlist.size,
-    onToggleWatchlistOnly: () => setWatchlistOnly((v) => !v),
   };
+
+  function dismissHero() {
+    sessionStorage.setItem('hero-dismissed', '1');
+    setHeroDismissed(true);
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {!heroDismissed && (
+        <div className="relative mb-6 rounded-2xl overflow-hidden shadow-md">
+          <img
+            src="/the_block_repo.png"
+            alt="The Block — A coding challenge from OPENLANE"
+            className="w-full object-cover max-h-48 sm:max-h-64"
+          />
+          <button
+            onClick={dismissHero}
+            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
+            aria-label="Dismiss banner"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
       <div className="flex gap-6">
         {/* Sidebar — visible lg+ */}
         <aside className="hidden lg:block w-56 flex-shrink-0">
@@ -92,15 +118,24 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
               <input
                 type="search"
                 value={filters.search}
-                onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-                placeholder="Search by Brand, model, VIN, lot…"
+                onChange={(e) => { setFilters((f) => ({ ...f, search: e.target.value })); setSearchFocused(true); }}
+                placeholder="Search by brand, model, VIN, lot…"
                 onKeyDown={handleSearchEnter}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
                 className={`w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border bg-white shadow-sm focus:outline-none focus:ring-2 placeholder:text-slate-300 transition-colors duration-150 ${
                   searchConfirmed
                     ? 'border-emerald-400 ring-2 ring-emerald-400 focus:ring-emerald-400 focus:border-emerald-400'
                     : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'
                 }`}
               />
+              {searchFocused && filters.search.length > 0 && (
+                <SearchSuggestions
+                  query={filters.search}
+                  setFilters={setFilters}
+                  onClose={() => setSearchFocused(false)}
+                />
+              )}
             </div>
             <button
               onClick={() => setDrawerOpen(true)}

@@ -13,7 +13,8 @@ function median(nums: number[]): number {
 const cache = new Map<string, PriceLabel | null>();
 
 export function getPriceLabel(vehicle: Vehicle): PriceLabel | null {
-  if (cache.has(vehicle.id)) return cache.get(vehicle.id)!;
+  const cacheKey = `${vehicle.id}-${vehicle.current_bid ?? 'none'}`;
+  if (cache.has(cacheKey)) return cache.get(cacheKey)!;
 
   const bid = vehicle.current_bid;
   if (bid == null) { cache.set(vehicle.id, null); return null; }
@@ -29,10 +30,10 @@ export function getPriceLabel(vehicle: Vehicle): PriceLabel | null {
       .map(v => v.current_bid as number);
   }
 
-  if (peers.length < 3) { cache.set(vehicle.id, null); return null; }
+  if (peers.length < 3) { cache.set(cacheKey, null); return null; }
 
   const ratio = bid / median(peers);
   const label: PriceLabel = ratio < 0.87 ? 'great-deal' : ratio > 1.13 ? 'high-bid' : 'fair-price';
-  cache.set(vehicle.id, label);
+  cache.set(cacheKey, label);
   return label;
 }

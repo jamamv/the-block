@@ -1,6 +1,14 @@
-# The Block — OPENLANE Auction Platform
+# The Block — Vehicle Auction Platform
 
 A buyer-side vehicle auction prototype built for the OPENLANE coding challenge.
+
+![The Block](public/the_block_repo.png)
+
+---
+
+## Live Demo
+
+Deployed on Vercel — **frontend works fully without the backend** (guest mode available).
 
 ---
 
@@ -12,20 +20,15 @@ A buyer-side vehicle auction prototype built for the OPENLANE coding challenge.
 git clone https://github.com/jamamv/the-block.git
 cd the-block
 npm install
-npm run dev:full
+npm run dev:full     # starts frontend (5173) + API server (3001) together
 ```
 
-This starts both the Vite dev server (port 5173) and the Express API server (port 3001) concurrently. Open [http://localhost:5173](http://localhost:5173).
-
-To run them separately:
-
+Frontend only (no auth, browse/compare/watchlist still work):
 ```bash
-npm run dev     # frontend only
-npm run server  # API server only
+npm run dev
 ```
 
-To build for production:
-
+Production build:
 ```bash
 npm run build
 npm run preview
@@ -35,102 +38,97 @@ npm run preview
 
 ## Stack
 
-- **Framework:** React 18 + Vite 8
-- **Language:** TypeScript (strict mode)
-- **Styling:** Tailwind CSS v4
-- **Routing:** React Router v7
-- **State:** React `useState` + `useMemo` — no external state library
-- **Persistence:** `localStorage` for bid state across sessions
-- **Auth:** Node.js + Express API, bcrypt password hashing, JWT tokens, SQLite user store
+| Layer | Tech |
+|---|---|
+| Frontend | React 18 + Vite 8 + TypeScript (strict) |
+| Styling | Tailwind CSS v4 (Vite plugin, no config file) |
+| Routing | React Router v7 |
+| Backend | Node.js + Express |
+| Auth | bcrypt + JWT + SQLite (better-sqlite3) |
+| Persistence | localStorage for bids, watchlist, followed dealers |
+| Deployment | Vercel (frontend) |
 
 ---
 
 ## What I Built
 
-A responsive web app covering the full buyer journey: browsing 200 vehicles, inspecting details, placing bids, and tracking active bids.
+A full buyer-side auction experience across four flows: **browse → inspect → bid → track**.
 
-**Inventory page**
-- Search across Brand, model, VIN, and lot number
-- Filter sidebar: Brand (15), Type, title status, province (7)
-- Sort by current bid, year, odometer, or condition grade
-- Responsive card grid with condition bar, bid count, and reserve status
-- Live auction status badges (Live / Ending Soon / Upcoming / Ended) on every card
+### Inventory
+- Search across brand, model, VIN, lot number, fuel type, body style, city
+- Predictive search suggestions: brand shortcuts, body type, auction status, fuel type
+- Sidebar filter panel: auction status (live/ending-soon/upcoming/ended), brand, body style, title status, province — with live counts
+- 5 sort options: highest bid, lowest bid, newest, low mileage, best condition
+- Card grid with condition bar, bid/reserve status, market value badge (Great Deal / High Bid)
+- Side-by-side vehicle comparison drawer (up to 2 vehicles) with diff highlighting
+- Watchlist (heart button per card, persisted to localStorage)
+- Saved view via URL param `/?saved=1` — shareable, bookmarkable
 
-**Detail page**
-- 4-photo image carousel with thumbnail strip
-- Full specs grid and condition panel with damage notes
-- Sticky bid panel: validates increment, shows reserve and buy-now price, dealer info
-- Auction countdown timer (live-normalized relative to "now")
-- Breadcrumb navigation back to inventory
+### Detail Page
+- 4-photo image gallery with thumbnail strip
+- Full specs grid, condition report, damage notes
+- Auction countdown (live, 30s tick)
+- Bid panel: $500 minimum increment, inline validation, confirmation step
+- Buy Now with confirmation step
+- Reserve price display and met/not-met indicator
+- Verified dealer badge (dealers with ≥5 listings) + Follow button (localStorage)
+- Retract bid flow with confirm prompt
 
-**Bidding**
-- Minimum increment of $500 enforced with inline validation
-- Confirmation step before a bid is submitted — prevents accidental bids
-- Bid state persisted to `localStorage` — bids survive a page refresh
-- Bid count and current bid update immediately on the card and detail panel
+### My Bids
+- Dedicated `/bids` page with per-vehicle outcome states: **Active / Won / Lost / Purchased**
+- Won (green border + trophy badge) when auction ended and reserve was met
+- Lost (grayscale thumbnail, "Reserve not met" badge) when reserve wasn't met
+- Retract active bids or remove ended ones
+- Subtitle shows counts: "2 active · 1 won · 1 not sold"
 
-**Buy Now**
-- Vehicles with a buy-now price show a dedicated Buy Now button
-- Confirmation step before purchase locks in the price
+### Notifications & UX
+- Bell icon with unread count — alerts for bids ending soon and watchlist auctions going live
+- Mobile bottom tab bar (Inventory / Saved / Bids / List Car) with count badges
+- Responsive layout with mobile filter drawer and desktop sidebar
+- "Continue as Guest" on login — bypasses auth for demo/Vercel deployment
 
-**My Bids**
-- Header badge shows active bid count at a glance
-- Dropdown panel lists every vehicle you've bid on with current bid, reserve status, and auction countdown
-- Direct link to each vehicle detail page
+### Auth
+- Register / login with email + password (bcrypt, 12 rounds)
+- JWT tokens (7-day expiry), verified on protected routes
+- Bid and Buy Now gated — unauthenticated users see a sign-in prompt with return-URL redirect
+- Guest mode: works fully when backend is unavailable (e.g., Vercel deployment)
 
-**Authentication**
-- Register with name, email, and password (bcrypt-hashed, stored in SQLite)
-- JWT tokens issued on login/register, verified on protected API routes
-- Bid and Buy Now actions are gated — unauthenticated users see a sign-in prompt with a return-URL redirect
-- Session persists across page refreshes via localStorage token
+### Submit a Car
+- Frontend form with validation: vehicle details, location, auction pricing, condition notes
+- Success screen on submit
 
 ---
 
 ## Notable Decisions
 
-**Bid state at the app root.** I lifted bid state to `App` via a `useBidState` hook rather than managing it locally in each page. This means the inventory cards reflect bids you've placed without needing a round-trip to a server — important for the "updated visible state" requirement.
+**URL as single source of truth for saved/watchlist view.** The `?saved=1` param drives the filter so the nav toggle and inventory filter are always in sync — no separate state to desync. Shareable and survives navigation.
 
-**No external state library.** `useMemo` for the filter/sort pipeline is fast enough for 200 records and keeps the dependency footprint minimal. I'd reach for Zustand or React Query if the dataset scaled or if we added real API calls.
+**Null-safe data layer.** 60 of 200 vehicles have `null` reserve prices; 112 have no current bids. Typed both fields as `number | null` and fixed every callsite (sort comparisons, `formatCurrency` calls, reserve-met logic) rather than masking with implicit coercion.
 
-**Filter and sort are decoupled.** Filtering narrows the set, sorting orders it. Both are pure functions in `src/utils/` that are easy to test and extend independently.
+**Market value badge.** Each vehicle's current bid is compared to the median bid for its body style + fuel type. Vehicles more than 13% below median get "Great Deal"; more than 13% above get "High Bid". Cache key includes `current_bid` so the badge updates immediately after bidding.
 
-**Tailwind v4 with the Vite plugin.** The `@tailwindcss/vite` plugin means no `tailwind.config.js` to maintain — CSS is generated from usage at build time. Slightly newer approach but cleaner for a greenfield project.
+**Compare drawer diff highlighting.** The side-by-side comparison highlights differing rows in amber. JSX-rendered rows (bid, condition, auction status) use a `cmp` extractor instead of stringifying React elements — `String(<Component />)` always returns `[object Object]` and would never diff correctly.
 
-**LocalStorage for persistence.** Keeps the prototype self-contained. The `useBidState` hook wraps reads/writes so swapping in a real API later is a one-file change.
+**No external state library.** `useMemo` over a pure filter/sort pipeline is fast enough for 200 records and keeps the bundle lean. Lifting bid state to the app root means cards update immediately without server round-trips.
 
-**Bid and Buy Now confirmation.** Both actions require a confirmation step before committing. In an auction context, an accidental bid is hard to undo — a one-step confirmation costs almost nothing and meaningfully increases trust.
+**Bid and Buy Now confirmation steps.** An accidental bid in an auction is essentially irreversible — the one-step modal costs nothing and meaningfully increases trust.
 
-**Auth gating on bidding, not browsing.** Anyone can browse inventory and inspect vehicles without an account. Creating an account is only required when you want to place a bid or buy now. This is deliberate — friction at the browse stage costs conversions; friction at the transaction stage is appropriate and expected.
-
-**TypeScript strict mode.** `noUnusedLocals`, `noUnusedParameters`, and `verbatimModuleSyntax` are all on. A bit more upfront discipline but the codebase stays clean as it grows.
-
----
-
-## Assumptions and Scope
-
-- Frontend-only — no auth, no backend, no payments
-- Auction timestamps in the dataset are synthetic; I display them as-is in the detail page auction section
-- Placeholder images from `placehold.co` are used as-is — a real build would swap these for CDN-hosted photos
-- The bid flow is optimistic by design: a placed bid is accepted immediately with no server validation
+**Auth gated on transactions, not browsing.** Anyone can browse, search, compare, and inspect without an account. Auth is only required to place a bid or buy now.
 
 ---
 
 ## Time Spent
 
-Approximately 5–6 hours, within the suggested 4–8 hour window.
-
-- ~1h scaffolding (Vite config, TypeScript, Tailwind, routing)
-- ~1.5h inventory page (filter/sort pipeline, card design)
-- ~2h detail page (gallery, specs, condition panel, bid panel)
-- ~1h polish and responsive layout
-- ~0.5h README and cleanup
+~12–15 hours total, built iteratively. Started with inventory and detail pages, then layered in bidding, auth, comparison, notifications, mobile UX, and polish. Gorilla-tested at the end to catch null-safety bugs and stale cache issues before push.
 
 ---
 
 ## What I'd Do With More Time
 
-- **Price range filter** — min/max bid slider to complement the existing filters
-- **Skeleton loading states** — replace blank grid gaps during initial render
-- **Keyboard navigation** in the image gallery
-- **Accessibility audit** — ARIA labels are minimal; a production build would need a proper pass
-- **Outbid notifications** — toast when another buyer surpasses your bid (would need a polling layer or websocket)
+- **Proxy bidding** — eBay-style max bid ceiling with tiered increments is more realistic than fixed $500 increments
+- **WebSocket real-time updates** — bid counts and current prices update across clients without polling
+- **Unit tests** — Vitest for filter/sort utilities, bid validation, price insight, and auction status logic
+- **E2E tests** — Playwright for full flows: browse → filter → bid → confirm → verify My Bids outcome state
+- **Price range slider** — min/max current bid filter to complement the existing sidebar
+- **Skeleton loading states** — replace blank grid gaps on initial render
+- **Accessibility audit** — ARIA labels, keyboard navigation, focus management in modals and gallery

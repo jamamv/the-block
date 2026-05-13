@@ -1,15 +1,19 @@
 import { useState, useCallback, useEffect } from 'react';
-import { getToken, clearToken, apiMe, apiLogin, apiRegister } from '../lib/api.ts';
+import { getToken, clearToken, apiMe, apiLogin, apiRegister, isGuestSession, setGuestSession, clearGuestSession, GUEST_USER } from '../lib/api.ts';
 import type { AuthUser } from '../lib/api.ts';
 
 export type { AuthUser };
 
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState<boolean>(!!getToken());
+  const [loading, setLoading] = useState<boolean>(!!getToken() || isGuestSession());
 
-  // On mount, verify the stored token and hydrate user state
   useEffect(() => {
+    if (isGuestSession()) {
+      setUser(GUEST_USER);
+      setLoading(false);
+      return;
+    }
     if (!getToken()) return;
     apiMe()
       .then(setUser)
@@ -29,10 +33,16 @@ export function useAuth() {
     return u;
   }, []);
 
+  const loginAsGuest = useCallback(() => {
+    setGuestSession();
+    setUser(GUEST_USER);
+  }, []);
+
   const logout = useCallback(() => {
     clearToken();
+    clearGuestSession();
     setUser(null);
   }, []);
 
-  return { user, loading, login, register, logout };
+  return { user, loading, login, register, loginAsGuest, logout };
 }

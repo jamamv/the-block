@@ -28,7 +28,7 @@ function BidRow({
 
   if (!vehicle || !bidState) return null;
 
-  const reserveMet = bidState.current_bid >= vehicle.reserve_price;
+  const reserveMet = vehicle.reserve_price != null && bidState.current_bid >= vehicle.reserve_price;
 
   const statusColor = {
     live: 'text-red-600',

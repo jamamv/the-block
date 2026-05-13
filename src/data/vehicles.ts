@@ -21,3 +21,11 @@ export const ALL_BODY_STYLES: BodyStyle[] = [
 export function getVehicleById(id: string): Vehicle | undefined {
   return vehicles.find((v) => v.id === id);
 }
+
+const _dealerCounts: Record<string, number> = {};
+for (const v of vehicles) {
+  _dealerCounts[v.selling_dealership] = (_dealerCounts[v.selling_dealership] ?? 0) + 1;
+}
+export const VERIFIED_DEALERS = new Set(
+  Object.entries(_dealerCounts).filter(([, c]) => c >= 5).map(([name]) => name),
+);

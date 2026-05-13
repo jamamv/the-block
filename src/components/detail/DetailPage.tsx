@@ -56,13 +56,13 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
           <p className="text-sm text-slate-500 mt-1">
             {formatLot(vehicle.lot)} · {vehicle.vin}
           </p>
+          <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
+            <TitleBadge status={vehicle.title_status} />
+            <FuelBadge fuel={vehicle.fuel_type} />
+            <ConditionBadge grade={vehicle.condition_grade} />
+          </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <AuctionStatusBadge auctionStart={vehicle.auction_start} />
-          <TitleBadge status={vehicle.title_status} />
-          <FuelBadge fuel={vehicle.fuel_type} />
-          <ConditionBadge grade={vehicle.condition_grade} />
-        </div>
+        <AuctionStatusBadge auctionStart={vehicle.auction_start} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -88,7 +88,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
               </div>
               <div>
                 <p className="text-xs text-slate-500 mb-0.5">Reserve Price</p>
-                <p className="font-semibold text-slate-800">{formatCurrency(vehicle.reserve_price)}</p>
+                <p className="font-semibold text-slate-800">{vehicle.reserve_price != null ? formatCurrency(vehicle.reserve_price) : 'No reserve'}</p>
               </div>
               {vehicle.buy_now_price !== null && (
                 <div>

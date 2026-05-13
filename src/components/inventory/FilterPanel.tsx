@@ -7,9 +7,6 @@ import { computeFilterCounts } from '../../utils/filter.ts';
 interface FilterPanelProps {
   filters: FilterState;
   onChange: (filters: FilterState) => void;
-  watchlistOnly: boolean;
-  watchlistCount: number;
-  onToggleWatchlistOnly: () => void;
 }
 
 const BrandS_PREVIEW = 6;
@@ -88,7 +85,7 @@ function CheckRow({
   );
 }
 
-export function FilterPanel({ filters, onChange, watchlistOnly, watchlistCount, onToggleWatchlistOnly }: FilterPanelProps) {
+export function FilterPanel({ filters, onChange }: FilterPanelProps) {
   const [showAllBrands, setShowAllBrands] = useState(false);
 
   const counts = useMemo(() => computeFilterCounts(vehicles), []);
@@ -128,36 +125,6 @@ export function FilterPanel({ filters, onChange, watchlistOnly, watchlistCount, 
 
   return (
     <div className="space-y-5">
-
-      {/* Watchlist toggle */}
-      <div>
-        <button
-          onClick={onToggleWatchlistOnly}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors ${
-            watchlistOnly
-              ? 'bg-red-500 text-white border-red-500'
-              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-          }`}
-        >
-          <svg
-            className={`w-4 h-4 flex-shrink-0 ${watchlistOnly ? 'text-white' : 'text-red-400'}`}
-            fill={watchlistOnly ? 'currentColor' : 'none'}
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-          <span className="flex-1 text-left">Saved only</span>
-          {watchlistCount > 0 && (
-            <span className={`text-xs tabular-nums ${watchlistOnly ? 'opacity-80' : 'text-slate-400'}`}>
-              {watchlistCount}
-            </span>
-          )}
-        </button>
-      </div>
-
-      <div className="border-t border-slate-100" />
 
       {/* Auction Status */}
       <div>

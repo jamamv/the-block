@@ -5,6 +5,8 @@ import type { AuthUser } from '../../hooks/useAuth.ts';
 import { formatCurrency } from '../../utils/format.ts';
 import { validateBid, minimumBid } from '../../utils/bid.ts';
 import { ReserveBadge } from '../ui/Badge.tsx';
+import { useFollowedDealers } from '../../hooks/useFollowedDealers.ts';
+import { VERIFIED_DEALERS } from '../../data/vehicles.ts';
 
 interface BidPanelProps {
   vehicle: Vehicle;
@@ -20,10 +22,13 @@ type BuyNowStep = 'idle' | 'confirm' | 'success';
 
 export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid, user }: BidPanelProps) {
   const location = useLocation();
+  const { followedDealers, toggleFollow } = useFollowedDealers();
+  const isVerified = VERIFIED_DEALERS.has(vehicle.selling_dealership);
+  const isFollowing = followedDealers.has(vehicle.selling_dealership);
   const boughtNow = bidState?.bought_now === true;
   const currentBid = bidState?.current_bid ?? vehicle.current_bid;
   const bidCount = bidState?.bid_count ?? vehicle.bid_count;
-  const reserveMet = currentBid >= vehicle.reserve_price;
+  const reserveMet = currentBid != null && vehicle.reserve_price != null && currentBid >= vehicle.reserve_price;
 
   const [inputValue, setInputValue] = useState('');
   const [pendingAmount, setPendingAmount] = useState(0);
@@ -32,12 +37,12 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid
   const [buyNowStep, setBuyNowStep] = useState<BuyNowStep>('idle');
   const [retractConfirm, setRetractConfirm] = useState(false);
 
-  const minBid = minimumBid(currentBid);
+  const minBid = currentBid != null ? minimumBid(currentBid) : vehicle.starting_bid;
 
   function handleBidSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     const amount = Number(inputValue.replace(/[^0-9]/g, ''));
-    const err = validateBid(amount, currentBid);
+    const err = validateBid(amount, currentBid ?? 0);
     if (err) { setErrorMsg(err); setBidStep('error'); return; }
     setPendingAmount(amount);
     setBidStep('confirm');
@@ -60,7 +65,7 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
         <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 text-center space-y-1">
           <p className="text-emerald-700 font-semibold text-sm">Purchased</p>
-          <p className="text-2xl font-bold text-emerald-800">{formatCurrency(currentBid)}</p>
+          <p className="text-2xl font-bold text-emerald-800">{currentBid != null ? formatCurrency(currentBid) : '—'}</p>
           <p className="text-xs text-emerald-600">You bought this vehicle outright.</p>
         </div>
         <div className="pt-2 border-t border-slate-100">
@@ -82,7 +87,10 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid
           <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Current Bid</span>
           <ReserveBadge met={reserveMet} />
         </div>
-        <p className="text-3xl font-bold text-slate-900">{formatCurrency(currentBid)}</p>
+        {currentBid != null
+          ? <p className="text-3xl font-bold text-slate-900">{formatCurrency(currentBid)}</p>
+          : <p className="text-2xl font-semibold text-slate-400">No bids yet</p>
+        }
         <p className="text-xs text-slate-500">
           {bidCount} {bidCount === 1 ? 'bid' : 'bids'} · Starting bid {formatCurrency(vehicle.starting_bid)}
         </p>
@@ -91,7 +99,7 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid
       {/* Reserve */}
       <div className="rounded-lg bg-slate-50 p-3 text-sm">
         <p className="text-xs text-slate-500 mb-0.5">Reserve</p>
-        <p className="font-semibold text-slate-800">{formatCurrency(vehicle.reserve_price)}</p>
+        <p className="font-semibold text-slate-800">{vehicle.reserve_price != null ? formatCurrency(vehicle.reserve_price) : 'No reserve'}</p>
       </div>
 
       {/* Auth wall — shown when not signed in */}
@@ -196,9 +204,33 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid
 
       {/* Dealer */}
       <div className="pt-2 border-t border-slate-100">
-        <p className="text-xs text-slate-500 font-medium mb-1">Sold by</p>
-        <p className="text-sm font-semibold text-slate-800">{vehicle.selling_dealership}</p>
-        <p className="text-xs text-slate-500">{vehicle.city}, {vehicle.province}</p>
+        <p className="text-xs text-slate-500 font-medium mb-1.5">Sold by</p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <p className="text-sm font-semibold text-slate-800">{vehicle.selling_dealership}</p>
+              {isVerified && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Verified
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">{vehicle.city}, {vehicle.province}</p>
+          </div>
+          <button
+            onClick={() => toggleFollow(vehicle.selling_dealership)}
+            className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
+              isFollowing
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'border-slate-300 text-slate-600 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50'
+            }`}
+          >
+            {isFollowing ? 'Following' : 'Follow'}
+          </button>
+        </div>
       </div>
 
       {/* Retract — only when signed in and has an active bid */}

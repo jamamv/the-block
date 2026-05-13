@@ -1,7 +1,11 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-export const JWT_SECRET = process.env.JWT_SECRET ?? 'the-block-dev-secret-change-in-prod';
+const fallbackSecret = 'the-block-dev-secret-change-in-prod';
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable must be set in production');
+}
+export const JWT_SECRET = process.env.JWT_SECRET ?? fallbackSecret;
 
 export interface AuthPayload {
   userId: string;

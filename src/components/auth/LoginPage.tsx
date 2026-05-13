@@ -4,9 +4,10 @@ import type { AuthUser } from '../../lib/api.ts';
 
 interface LoginPageProps {
   onLogin: (email: string, password: string) => Promise<AuthUser>;
+  onGuest: () => void;
 }
 
-export function LoginPage({ onLogin }: LoginPageProps) {
+export function LoginPage({ onLogin, onGuest }: LoginPageProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnTo = searchParams.get('return') ?? '/';
@@ -83,15 +84,24 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             </button>
           </form>
 
-          <p className="text-center text-xs text-slate-500 mt-4">
-            No account?{' '}
-            <Link
-              to={`/register${returnTo !== '/' ? `?return=${encodeURIComponent(returnTo)}` : ''}`}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+          <div className="mt-4 pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => { onGuest(); navigate(returnTo, { replace: true }); }}
+              className="w-full py-2.5 rounded-lg border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors"
             >
-              Create one
-            </Link>
-          </p>
+              Continue as Guest
+            </button>
+            <p className="text-center text-xs text-slate-400 mt-3">
+              No account?{' '}
+              <Link
+                to={`/register${returnTo !== '/' ? `?return=${encodeURIComponent(returnTo)}` : ''}`}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Create one
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

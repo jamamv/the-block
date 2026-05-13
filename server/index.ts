@@ -5,7 +5,8 @@ import authRouter from './routes/auth.ts';
 const app = express();
 const PORT = process.env.PORT ?? 3001;
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+const ALLOWED_ORIGIN = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+app.use(cors({ origin: ALLOWED_ORIGIN, credentials: true }));
 app.use(express.json());
 
 app.use('/api/auth', authRouter);

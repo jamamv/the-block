@@ -21,17 +21,16 @@ const PRICE_BADGE: Record<PriceLabel, { text: string; className: string }> = {
   'high-bid':   { text: '↑ High Bid',   className: 'bg-amber-50 text-amber-700 border border-amber-200' },
 };
 
-function StarRating({ grade }: { grade: number }) {
-  const filled = Math.round(grade);
-  const color = grade >= 4 ? 'text-emerald-500' : grade >= 3 ? 'text-amber-500' : 'text-red-400';
+function ConditionBar({ grade }: { grade: number }) {
+  const barColor = grade >= 4 ? 'bg-emerald-500' : grade >= 3 ? 'bg-amber-400' : 'bg-red-400';
+  const textColor = grade >= 4 ? 'text-emerald-600' : grade >= 3 ? 'text-amber-600' : 'text-red-500';
   return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }, (_, i) => (
-        <svg key={i} className={`w-3.5 h-3.5 ${i < filled ? color : 'text-slate-200'}`} fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-      <span className={`text-xs font-semibold ml-1 ${color}`}>{grade.toFixed(1)}</span>
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide whitespace-nowrap">Condition</span>
+      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className={`h-full rounded-full ${barColor}`} style={{ width: `${(grade / 5) * 100}%` }} />
+      </div>
+      <span className={`text-xs font-bold tabular-nums ${textColor}`}>{grade.toFixed(1)}<span className="text-slate-300 font-normal">/5</span></span>
     </div>
   );
 }
@@ -39,8 +38,8 @@ function StarRating({ grade }: { grade: number }) {
 export function VehicleCard({ vehicle, bidState, isWatched, onToggleWatch, isInCompare, canAddToCompare, onToggleCompare }: VehicleCardProps) {
   const currentBid = bidState?.current_bid ?? vehicle.current_bid;
   const bidCount = bidState?.bid_count ?? vehicle.bid_count;
-  const reserveMet = currentBid != null && currentBid >= vehicle.reserve_price;
-  const priceLabel = getPriceLabel({ ...vehicle, current_bid: currentBid ?? vehicle.current_bid });
+  const reserveMet = currentBid != null && vehicle.reserve_price != null && currentBid >= vehicle.reserve_price;
+  const priceLabel = getPriceLabel({ ...vehicle, current_bid: currentBid ?? null });
   const priceBadge = priceLabel && priceLabel !== 'fair-price' ? PRICE_BADGE[priceLabel] : null;
 
   return (
@@ -94,7 +93,7 @@ export function VehicleCard({ vehicle, bidState, isWatched, onToggleWatch, isInC
             <p className="text-xs text-slate-500 mt-0.5">{vehicle.trim} · {formatOdometer(vehicle.odometer_km)}</p>
           </div>
 
-          <StarRating grade={vehicle.condition_grade} />
+          <ConditionBar grade={vehicle.condition_grade} />
 
           <div className="flex items-end justify-between mt-auto pt-2 border-t border-slate-100">
             <div>
