@@ -29,7 +29,6 @@ export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggesti
     const now = Date.now();
     const result: Suggestion[] = [];
 
-    // Auction status shortcuts
     const liveCount = vehicles.filter((v) =>
       getAuctionStatus(getNormalizedAuctionStart(v.auction_start), now) === 'live'
     ).length;
@@ -38,25 +37,12 @@ export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggesti
     ).length;
 
     if (liveCount > 0 && 'live auction'.includes(q)) {
-      result.push({
-        id: 'status-live',
-        icon: 'status',
-        label: 'Live Auctions',
-        sublabel: `${liveCount} vehicles`,
-        patch: { auctionStatuses: ['live'] },
-      });
+      result.push({ id: 'status-live', icon: 'status', label: 'Live Auctions', sublabel: `${liveCount} vehicles`, patch: { auctionStatuses: ['live'] } });
     }
     if (endingCount > 0 && 'ending soon'.includes(q)) {
-      result.push({
-        id: 'status-ending',
-        icon: 'status',
-        label: 'Ending Soon',
-        sublabel: `${endingCount} vehicles`,
-        patch: { auctionStatuses: ['ending-soon'] },
-      });
+      result.push({ id: 'status-ending', icon: 'status', label: 'Ending Soon', sublabel: `${endingCount} vehicles`, patch: { auctionStatuses: ['ending-soon'] } });
     }
 
-    // Fuel type shortcuts — haystack already contains fuel_type so text search handles filtering
     if (q.length >= 2 && 'electric'.includes(q)) {
       const count = vehicles.filter((v) => v.fuel_type === 'electric').length;
       if (count > 0) result.push({ id: 'fuel-electric', icon: 'fuel', label: 'Electric Vehicles', sublabel: `${count} vehicles`, patch: {} });
@@ -66,31 +52,17 @@ export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggesti
       if (count > 0) result.push({ id: 'fuel-hybrid', icon: 'fuel', label: 'Hybrid Vehicles', sublabel: `${count} vehicles`, patch: {} });
     }
 
-    // Brand matches
     const brandMatches = ALL_BrandS.filter((b) => b.toLowerCase().includes(q));
     for (const brand of brandMatches.slice(0, 3)) {
       const count = vehicles.filter((v) => v.Brand === brand).length;
-      result.push({
-        id: `brand-${brand}`,
-        icon: 'brand',
-        label: brand,
-        sublabel: `${count} vehicles`,
-        patch: { Brands: [brand] },
-      });
+      result.push({ id: `brand-${brand}`, icon: 'brand', label: brand, sublabel: `${count} vehicles`, patch: { Brands: [brand] } });
     }
 
-    // Body style matches
     for (const bs of ALL_BODY_STYLES) {
       const label = BODY_LABELS[bs];
       if (bs.includes(q) || label.toLowerCase().includes(q)) {
         const count = vehicles.filter((v) => v.body_style === bs).length;
-        result.push({
-          id: `body-${bs}`,
-          icon: 'body',
-          label,
-          sublabel: `${count} vehicles`,
-          patch: { bodyStyles: [bs] },
-        });
+        result.push({ id: `body-${bs}`, icon: 'body', label, sublabel: `${count} vehicles`, patch: { bodyStyles: [bs] } });
       }
     }
 
@@ -100,7 +72,7 @@ export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggesti
   if (suggestions.length === 0) return null;
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-slate-200 z-30 overflow-hidden">
+    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-30 overflow-hidden">
       {suggestions.map((s) => (
         <button
           key={s.id}
@@ -109,9 +81,9 @@ export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggesti
             setFilters((f) => ({ ...f, ...s.patch }));
             onClose();
           }}
-          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left"
+          className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left"
         >
-          <span className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0 text-slate-500">
+          <span className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center flex-shrink-0 text-slate-500 dark:text-slate-400">
             {s.icon === 'brand' && (
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -135,8 +107,8 @@ export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggesti
             )}
           </span>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-slate-900">{s.label}</p>
-            <p className="text-xs text-slate-400">{s.sublabel}</p>
+            <p className="text-sm font-medium text-slate-900 dark:text-white">{s.label}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{s.sublabel}</p>
           </div>
         </button>
       ))}

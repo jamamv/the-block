@@ -11,6 +11,8 @@ import { EmptyState } from '../ui/EmptyState.tsx';
 import { CompareDrawer } from '../ui/CompareDrawer.tsx';
 import { useComparison } from '../../hooks/useComparison.ts';
 import { SearchSuggestions } from './SearchSuggestions.tsx';
+import { useFollowedDealers } from '../../hooks/useFollowedDealers.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface InventoryPageProps {
   bidStateMap: BidStateMap;
@@ -19,9 +21,9 @@ interface InventoryPageProps {
 }
 
 export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: InventoryPageProps) {
+  const { t } = useSettings();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Both derived from URL — shareable, bookmarkable, back-button correct
   const watchlistOnly = searchParams.get('saved') === '1';
   const q = searchParams.get('q') ?? '';
 
@@ -32,6 +34,7 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
   const [searchFocused, setSearchFocused] = useState(false);
   const [heroDismissed, setHeroDismissed] = useState(() => sessionStorage.getItem('hero-dismissed') === '1');
   const { compareIds, toggleCompare, removeCompare, clearCompare, canAdd } = useComparison();
+  const { followedDealers, toggleFollow } = useFollowedDealers();
 
   function setQ(value: string) {
     const p = new URLSearchParams(searchParams);
@@ -47,7 +50,6 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
     }
   }
 
-  // Search lives in URL; other filters in component state
   const filtered = useMemo(
     () => filterVehicles(vehicles, { ...filters, search: q }),
     [filters, q],
@@ -103,16 +105,45 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
       <div className="flex gap-6">
         {/* Sidebar — visible lg+ */}
         <aside className="hidden lg:block w-56 flex-shrink-0">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-thin">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-slate-800">Filters</h2>
+              <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{t('filter.title')}</h2>
               {filterActive && (
                 <button onClick={handleClearFilters} className="text-xs text-blue-600 hover:text-blue-700">
-                  Clear all
+                  {t('filter.clear_all')}
                 </button>
               )}
             </div>
             <FilterPanel filters={filters} onChange={setFilters} />
+
+            {followedDealers.size > 0 && (
+              <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-700">
+                <h3 className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5">
+                  {t('filter.following')}
+                </h3>
+                <div className="space-y-1">
+                  {[...followedDealers].map((dealer) => (
+                    <div key={dealer} className="flex items-center gap-1 group">
+                      <button
+                        onClick={() => setQ(dealer)}
+                        className="flex-1 text-left text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 truncate py-0.5 transition-colors"
+                      >
+                        {dealer}
+                      </button>
+                      <button
+                        onClick={() => toggleFollow(dealer)}
+                        className="opacity-0 group-hover:opacity-100 text-slate-300 dark:text-slate-600 hover:text-red-400 transition-all p-0.5"
+                        aria-label={`Unfollow ${dealer}`}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -130,14 +161,14 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
                 type="search"
                 value={q}
                 onChange={(e) => { setQ(e.target.value); setSearchFocused(true); }}
-                placeholder="Search by brand, model, VIN, lot…"
+                placeholder={t('search.placeholder')}
                 onKeyDown={handleSearchEnter}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                className={`w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border bg-white shadow-sm focus:outline-none focus:ring-2 placeholder:text-slate-300 transition-colors duration-150 ${
+                className={`w-full pl-9 pr-4 py-2.5 text-sm rounded-lg border bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm focus:outline-none focus:ring-2 placeholder:text-slate-300 dark:placeholder:text-slate-600 transition-colors duration-150 ${
                   searchConfirmed
                     ? 'border-emerald-400 ring-2 ring-emerald-400 focus:ring-emerald-400 focus:border-emerald-400'
-                    : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'
+                    : 'border-slate-300 dark:border-slate-600 focus:ring-blue-500 focus:border-blue-500'
                 }`}
               />
               {searchFocused && q.length > 0 && (
@@ -150,12 +181,12 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
             </div>
             <button
               onClick={() => setDrawerOpen(true)}
-              className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+              className="lg:hidden flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-200 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M11 12h2" />
               </svg>
-              Filters
+              {t('search.filter_btn')}
               {activeCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">
                   {activeCount}
@@ -196,25 +227,25 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
       {drawerOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100">
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-white dark:bg-slate-800 shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-slate-100 dark:border-slate-700">
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-slate-900">Filters</h2>
+                <h2 className="text-base font-semibold text-slate-900 dark:text-white">{t('filter.title')}</h2>
                 {activeCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
-                    {activeCount} active
+                  <span className="px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-semibold">
+                    {t('filter.active', { n: activeCount })}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-3">
                 {filterActive && (
                   <button onClick={handleClearFilters} className="text-xs text-blue-600 font-medium">
-                    Clear all
+                    {t('filter.clear_all')}
                   </button>
                 )}
                 <button
                   onClick={() => setDrawerOpen(false)}
-                  className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors"
                   aria-label="Close filters"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,12 +257,14 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
             <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
               <FilterPanel filters={filters} onChange={setFilters} />
             </div>
-            <div className="p-4 border-t border-slate-100">
+            <div className="p-4 border-t border-slate-100 dark:border-slate-700">
               <button
                 onClick={() => setDrawerOpen(false)}
                 className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-colors"
               >
-                Show {display.length} result{display.length !== 1 ? 's' : ''}
+                {display.length === 1
+                  ? t('filter.show_results', { n: display.length })
+                  : t('filter.show_results_plural', { n: display.length })}
               </button>
             </div>
           </div>

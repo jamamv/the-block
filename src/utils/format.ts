@@ -1,11 +1,14 @@
 import type { BodyStyle, TitleStatus } from '../types/vehicle.ts';
 
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-CA', {
+const USD_RATE = 0.73;
+
+export function formatCurrency(amount: number, currency: 'CAD' | 'USD' = 'CAD'): string {
+  const displayAmount = currency === 'USD' ? Math.round(amount * USD_RATE) : amount;
+  return new Intl.NumberFormat(currency === 'USD' ? 'en-US' : 'en-CA', {
     style: 'currency',
-    currency: 'CAD',
+    currency,
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(displayAmount);
 }
 
 export function formatOdometer(km: number): string {

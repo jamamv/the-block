@@ -1,5 +1,6 @@
 import type { SortKey } from '../../types/vehicle.ts';
-import { SORT_OPTIONS } from '../../utils/sort.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
+import type { Locale } from '../../utils/i18n.ts';
 
 interface SortBarProps {
   count: number;
@@ -8,33 +9,46 @@ interface SortBarProps {
   onSortChange: (key: SortKey) => void;
 }
 
+type TKey = Parameters<ReturnType<typeof import('../../utils/i18n.ts').getT>>[0];
+
+const SORT_KEY_LABELS: Record<SortKey, TKey> = {
+  bid_desc:       'sort.bid_desc',
+  bid_asc:        'sort.bid_asc',
+  year_desc:      'sort.newest',
+  odometer_asc:   'sort.mileage',
+  condition_desc: 'sort.condition',
+};
+
+const SORT_KEYS: SortKey[] = ['bid_desc', 'bid_asc', 'year_desc', 'odometer_asc', 'condition_desc'];
+
 export function SortBar({ count, total, sortKey, onSortChange }: SortBarProps) {
+  const { t } = useSettings();
   return (
     <div className="flex items-center justify-between gap-3 mb-3">
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-slate-400 dark:text-slate-500">
         {count === total ? (
-          <><span className="font-semibold text-slate-600">{total}</span> vehicles</>
+          <><span className="font-semibold text-slate-600 dark:text-slate-300">{total}</span> {t('sort.vehicles')}</>
         ) : (
-          <><span className="font-semibold text-slate-600">{count}</span> of {total}</>
+          <><span className="font-semibold text-slate-600 dark:text-slate-300">{count}</span> {t('sort.of')} {total}</>
         )}
       </p>
 
       <div className="flex items-center gap-1.5">
-        <span className="text-xs text-slate-400 hidden sm:block">Sort</span>
+        <span className="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">{t('sort.label')}</span>
         <div className="relative">
           <select
             value={sortKey}
             onChange={(e) => onSortChange(e.target.value as SortKey)}
-            className="appearance-none text-xs border border-slate-200 rounded-lg pl-2.5 pr-7 py-1.5 bg-white text-slate-600 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-300 transition-colors cursor-pointer"
+            className="appearance-none text-xs border border-slate-200 dark:border-slate-700 rounded-lg pl-2.5 pr-7 py-1.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-slate-300 dark:hover:border-slate-600 transition-colors cursor-pointer"
           >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
+            {SORT_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {t(SORT_KEY_LABELS[key])}
               </option>
             ))}
           </select>
           <svg
-            className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400"
+            className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 dark:text-slate-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

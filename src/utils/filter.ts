@@ -29,7 +29,7 @@ export function filterVehicles(
   const search = filters.search.trim().toLowerCase();
   return vehicles.filter((v) => {
     if (search) {
-      const haystack = `${v.year} ${v.Brand} ${v.model} ${v.trim} ${v.vin} ${v.lot} ${v.fuel_type} ${v.body_style} ${v.city} ${v.province}`.toLowerCase();
+      const haystack = `${v.year} ${v.Brand} ${v.model} ${v.trim} ${v.vin} ${v.lot} ${v.fuel_type} ${v.body_style} ${v.city} ${v.province} ${v.selling_dealership}`.toLowerCase();
       if (!haystack.includes(search)) return false;
     }
     if (filters.auctionStatuses.length) {

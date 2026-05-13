@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { AuctionNotification } from '../../hooks/useNotifications.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface NotificationBellProps {
   notifications: AuctionNotification[];
@@ -13,6 +14,7 @@ const TYPE_META = {
 };
 
 export function NotificationBell({ notifications }: NotificationBellProps) {
+  const { t } = useSettings();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -30,7 +32,7 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors text-slate-500"
+        className="relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400"
         aria-label={`${count} notification${count !== 1 ? 's' : ''}`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,19 +51,19 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-lg border border-slate-200 z-30 overflow-hidden">
-          <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-            <p className="text-sm font-semibold text-slate-900">Notifications</p>
-            {count > 0 && <span className="text-xs text-slate-400">{count} active</span>}
+        <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-30 overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('misc.notifications')}</p>
+            {count > 0 && <span className="text-xs text-slate-400 dark:text-slate-500">{t('misc.n_active', { n: count })}</span>}
           </div>
 
           {count === 0 ? (
             <div className="px-4 py-8 text-center">
-              <p className="text-sm text-slate-400">No alerts right now.</p>
-              <p className="text-xs text-slate-300 mt-1">Watch vehicles or place bids to get alerts.</p>
+              <p className="text-sm text-slate-400 dark:text-slate-500">{t('misc.no_notifications')}</p>
+              <p className="text-xs text-slate-300 dark:text-slate-600 mt-1">{t('misc.notification_desc')}</p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-50 max-h-80 overflow-y-auto scrollbar-thin">
+            <div className="divide-y divide-slate-50 dark:divide-slate-700 max-h-80 overflow-y-auto scrollbar-thin">
               {notifications.map((n) => {
                 const meta = TYPE_META[n.type];
                 return (
@@ -69,14 +71,14 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
                     key={n.id}
                     to={`/vehicle/${n.vehicleId}`}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                   >
                     <img src={n.image} className="w-12 h-9 object-cover rounded-lg flex-shrink-0" alt="" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-semibold text-slate-900 truncate">{n.title}</p>
+                      <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{n.title}</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${meta.dot}`} />
-                        <span className="text-xs text-slate-500">{meta.label} · {n.countdown}</span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">{meta.label} · {n.countdown}</span>
                       </div>
                     </div>
                   </Link>

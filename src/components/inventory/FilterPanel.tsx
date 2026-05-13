@@ -3,6 +3,7 @@ import type { FilterState, BodyStyle, TitleStatus, AuctionStatusFilter } from '.
 import { ALL_BrandS, ALL_PROVINCES, ALL_BODY_STYLES, vehicles } from '../../data/vehicles.ts';
 import { bodyStyleLabel, titleStatusLabel } from '../../utils/format.ts';
 import { computeFilterCounts } from '../../utils/filter.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface FilterPanelProps {
   filters: FilterState;
@@ -13,46 +14,48 @@ const BrandS_PREVIEW = 6;
 const TITLE_STATUSES: TitleStatus[] = ['clean', 'rebuilt', 'salvage'];
 const AUCTION_STATUSES: AuctionStatusFilter[] = ['live', 'ending-soon', 'upcoming', 'ended'];
 
-const AUCTION_STATUS_CONFIG: Record<AuctionStatusFilter, {
-  label: string;
+type StatusConfig = {
+  tKey: 'status.live' | 'status.ending_soon' | 'status.upcoming' | 'status.ended';
   pulse: boolean;
   dot: string;
   active: string;
   inactive: string;
-}> = {
+};
+
+const AUCTION_STATUS_CONFIG: Record<AuctionStatusFilter, StatusConfig> = {
   live: {
-    label: 'Live',
+    tKey: 'status.live',
     pulse: true,
     dot: 'bg-red-500',
     active: 'bg-red-500 text-white border-red-500',
-    inactive: 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
+    inactive: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30',
   },
   'ending-soon': {
-    label: 'Ending Soon',
+    tKey: 'status.ending_soon',
     pulse: false,
     dot: 'bg-orange-500',
     active: 'bg-orange-500 text-white border-orange-500',
-    inactive: 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100',
+    inactive: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/30',
   },
   upcoming: {
-    label: 'Upcoming',
+    tKey: 'status.upcoming',
     pulse: false,
     dot: 'bg-blue-500',
     active: 'bg-blue-500 text-white border-blue-500',
-    inactive: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
+    inactive: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30',
   },
   ended: {
-    label: 'Ended',
+    tKey: 'status.ended',
     pulse: false,
     dot: 'bg-slate-400',
     active: 'bg-slate-500 text-white border-slate-500',
-    inactive: 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200',
+    inactive: 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600',
   },
 };
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2.5">
+    <h3 className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5">
       {title}
     </h3>
   );
@@ -75,17 +78,18 @@ function CheckRow({
         type="checkbox"
         checked={checked}
         onChange={onChange}
-        className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 flex-shrink-0"
+        className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-0 flex-shrink-0 dark:bg-slate-700"
       />
-      <span className={`flex-1 text-sm leading-snug ${checked ? 'text-slate-900 font-medium' : 'text-slate-600 group-hover:text-slate-900'} transition-colors`}>
+      <span className={`flex-1 text-sm leading-snug ${checked ? 'text-slate-900 dark:text-white font-medium' : 'text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'} transition-colors`}>
         {label}
       </span>
-      <span className="text-xs text-slate-400 tabular-nums">{count}</span>
+      <span className="text-xs text-slate-400 dark:text-slate-500 tabular-nums">{count}</span>
     </label>
   );
 }
 
 export function FilterPanel({ filters, onChange }: FilterPanelProps) {
+  const { t } = useSettings();
   const [showAllBrands, setShowAllBrands] = useState(false);
 
   const counts = useMemo(() => computeFilterCounts(vehicles), []);
@@ -126,9 +130,8 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
   return (
     <div className="space-y-5">
 
-      {/* Auction Status */}
       <div>
-        <SectionHeader title="Auction Status" />
+        <SectionHeader title={t('filter.auction_status')} />
         <div className="space-y-1.5">
           {AUCTION_STATUSES.map((status) => {
             const cfg = AUCTION_STATUS_CONFIG[status];
@@ -146,7 +149,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
                 ) : (
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${cfg.dot} ${cfg.pulse ? 'animate-pulse' : ''}`} />
                 )}
-                <span className="flex-1 text-left">{cfg.label}</span>
+                <span className="flex-1 text-left">{t(cfg.tKey)}</span>
                 <span className={`text-xs tabular-nums ${active ? 'opacity-75' : 'opacity-60'}`}>
                   {counts.auctionStatuses[status] ?? 0}
                 </span>
@@ -156,11 +159,10 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
         </div>
       </div>
 
-      <div className="border-t border-slate-100" />
+      <div className="border-t border-slate-100 dark:border-slate-700" />
 
-      {/* Brand */}
       <div>
-        <SectionHeader title="Brand" />
+        <SectionHeader title={t('filter.brand')} />
         <div className="space-y-0.5">
           {visibleBrands.map((Brand) => (
             <CheckRow
@@ -180,16 +182,15 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
             <svg className={`w-3.5 h-3.5 transition-transform ${showAllBrands ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-            {showAllBrands ? 'Show less' : `${hiddenCount} more brands`}
+            {showAllBrands ? t('filter.show_less') : t('filter.more_brands', { n: hiddenCount })}
           </button>
         )}
       </div>
 
-      <div className="border-t border-slate-100" />
+      <div className="border-t border-slate-100 dark:border-slate-700" />
 
-      {/* Type */}
       <div>
-        <SectionHeader title="Type" />
+        <SectionHeader title={t('filter.type')} />
         <div className="space-y-0.5">
           {ALL_BODY_STYLES.map((style) => (
             <CheckRow
@@ -203,11 +204,10 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
         </div>
       </div>
 
-      <div className="border-t border-slate-100" />
+      <div className="border-t border-slate-100 dark:border-slate-700" />
 
-      {/* Title Status */}
       <div>
-        <SectionHeader title="Title Status" />
+        <SectionHeader title={t('filter.title_status')} />
         <div className="space-y-0.5">
           {TITLE_STATUSES.map((status) => (
             <CheckRow
@@ -221,11 +221,10 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
         </div>
       </div>
 
-      <div className="border-t border-slate-100" />
+      <div className="border-t border-slate-100 dark:border-slate-700" />
 
-      {/* Province */}
       <div>
-        <SectionHeader title="Province" />
+        <SectionHeader title={t('filter.province')} />
         <div className="space-y-0.5">
           {ALL_PROVINCES.map((province) => (
             <CheckRow
