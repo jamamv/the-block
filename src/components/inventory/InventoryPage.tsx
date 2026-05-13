@@ -32,7 +32,6 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchConfirmed, setSearchConfirmed] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
-  const [heroDismissed, setHeroDismissed] = useState(() => sessionStorage.getItem('hero-dismissed') === '1');
   const { compareIds, toggleCompare, removeCompare, clearCompare, canAdd } = useComparison();
   const { followedDealers, toggleFollow } = useFollowedDealers();
 
@@ -77,31 +76,8 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
     filters.titleStatuses.length +
     filters.provinces.length;
 
-  function dismissHero() {
-    sessionStorage.setItem('hero-dismissed', '1');
-    setHeroDismissed(true);
-  }
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {!heroDismissed && (
-        <div className="relative mb-6 rounded-2xl overflow-hidden shadow-md aspect-[16/9] sm:aspect-[3/1] lg:aspect-[4.8/1]">
-          <img
-            src="/the_block_repo.png"
-            alt="The Block — A coding challenge from OPENLANE"
-            className="w-full h-full object-cover object-[50%_58%]"
-          />
-          <button
-            onClick={dismissHero}
-            className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors"
-            aria-label="Dismiss banner"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      )}
       <div className="flex gap-6">
         {/* Sidebar — visible lg+ */}
         <aside className="hidden lg:block w-56 flex-shrink-0">
