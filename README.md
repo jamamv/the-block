@@ -10,6 +10,8 @@ The app focuses on the core buyer journey: browse auction inventory, inspect a v
 
 ## Live Demo
 
+Production deployment: https://the-block-omega.vercel.app
+
 Deployed on Vercel. The frontend is designed to keep working without the API server by using guest mode and local browser persistence.
 
 ---
