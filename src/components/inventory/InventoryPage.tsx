@@ -85,11 +85,11 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {!heroDismissed && (
-        <div className="relative mb-6 rounded-2xl overflow-hidden shadow-md">
+        <div className="relative mb-6 rounded-2xl overflow-hidden shadow-md aspect-[16/9] sm:aspect-[3/1] lg:aspect-[4.8/1]">
           <img
             src="/the_block_repo.png"
             alt="The Block — A coding challenge from OPENLANE"
-            className="w-full object-cover max-h-48 sm:max-h-64"
+            className="w-full h-full object-cover object-[50%_58%]"
           />
           <button
             onClick={dismissHero}

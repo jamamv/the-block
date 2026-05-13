@@ -229,11 +229,26 @@ For production, `JWT_SECRET` should be set explicitly.
 
 ---
 
+## Product Thinking
+
+I tried to make the prototype feel like something a buyer could actually use, not just a table of auction data.
+
+- **Low-friction discovery:** buyers can browse, search, filter, save, and compare before being asked to create an account.
+- **Trust around high-intent actions:** bidding and Buy Now both use validation and confirmation steps because accidental auction actions are costly.
+- **Mobile buyer behavior:** saved vehicles, My Bids, filter drawer, and the bottom navigation are designed for checking auctions quickly from a phone.
+- **Shareability:** detail pages include a WhatsApp share action because car buying is often collaborative. A buyer may want to send a listing to a partner, friend, or mechanic before bidding.
+- **Demo resilience:** guest mode keeps the full buyer journey available even when the backend is not running or the app is deployed as a frontend-only Vercel build.
+- **Return-path auth:** login/register flows send users back to the vehicle they were trying to bid on instead of dropping them at a generic page.
+
+---
+
 ## Notable Decisions
 
 **Auth gated on transactions, not browsing.** Anyone can browse, search, filter, inspect, save, and compare vehicles. Auth is required only when the user tries to bid or buy.
 
 **Guest mode for resilient demos.** The deployed frontend remains useful even when the API is not available. Users can continue as guest and still exercise the main auction flow.
+
+**WhatsApp sharing on vehicle detail.** I added direct sharing because a vehicle purchase usually involves quick second opinions. It is a small feature, but it reflects how users actually evaluate expensive listings.
 
 **URL-driven saved view.** The saved inventory view is controlled by `?saved=1`, which makes it shareable and prevents nav state from drifting away from page state.
 
