@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useBidState } from './hooks/useBidState.ts';
 import { useAuth } from './hooks/useAuth.ts';
+import { useWatchlist } from './hooks/useWatchlist.ts';
 import { InventoryPage } from './components/inventory/InventoryPage.tsx';
 import { DetailPage } from './components/detail/DetailPage.tsx';
 import { MyBidsPanel } from './components/ui/MyBidsPanel.tsx';
@@ -159,6 +160,7 @@ function Header({
 export default function App() {
   const { bidStateMap, placeBid, buyNow, retractBid } = useBidState();
   const { user, loading, login, register, logout } = useAuth();
+  const { watchlist, toggleWatch } = useWatchlist();
 
   if (loading) {
     return (
@@ -179,7 +181,7 @@ export default function App() {
         />
         <main className="flex-1">
           <Routes>
-            <Route path="/" element={<InventoryPage bidStateMap={bidStateMap} />} />
+            <Route path="/" element={<InventoryPage bidStateMap={bidStateMap} watchlist={watchlist} toggleWatch={toggleWatch} />} />
             <Route
               path="/vehicle/:id"
               element={

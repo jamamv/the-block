@@ -10,7 +10,7 @@ interface SortBarProps {
 
 export function SortBar({ count, total, sortKey, onSortChange }: SortBarProps) {
   return (
-    <div className="flex items-center justify-between gap-4 py-3 border-b border-slate-100 mb-4">
+    <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100 mb-2">
       <p className="text-sm text-slate-500">
         {count === total ? (
           <><span className="font-semibold text-slate-900">{total}</span> vehicles</>
