@@ -1,6 +1,5 @@
 import type { SortKey } from '../../types/vehicle.ts';
 import { useSettings } from '../../contexts/SettingsContext.tsx';
-import type { Locale } from '../../utils/i18n.ts';
 
 interface SortBarProps {
   count: number;
