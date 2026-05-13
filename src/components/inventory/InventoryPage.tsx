@@ -20,8 +20,10 @@ interface InventoryPageProps {
 
 export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: InventoryPageProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  // Derived directly from URL so nav toggles stay in sync without remounting
+
+  // Both derived from URL — shareable, bookmarkable, back-button correct
   const watchlistOnly = searchParams.get('saved') === '1';
+  const q = searchParams.get('q') ?? '';
 
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [sortKey, setSortKey] = useState<SortKey>('bid_desc');
@@ -31,6 +33,13 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
   const [heroDismissed, setHeroDismissed] = useState(() => sessionStorage.getItem('hero-dismissed') === '1');
   const { compareIds, toggleCompare, removeCompare, clearCompare, canAdd } = useComparison();
 
+  function setQ(value: string) {
+    const p = new URLSearchParams(searchParams);
+    if (value) p.set('q', value);
+    else p.delete('q');
+    setSearchParams(p, { replace: true });
+  }
+
   function handleSearchEnter(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter') {
       setSearchConfirmed(true);
@@ -38,7 +47,11 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
     }
   }
 
-  const filtered = useMemo(() => filterVehicles(vehicles, filters), [filters]);
+  // Search lives in URL; other filters in component state
+  const filtered = useMemo(
+    () => filterVehicles(vehicles, { ...filters, search: q }),
+    [filters, q],
+  );
   const sorted = useMemo(() => sortVehicles(filtered, sortKey, bidStateMap), [filtered, sortKey, bidStateMap]);
   const display = useMemo(
     () => watchlistOnly ? sorted.filter((v) => watchlist.has(v.id)) : sorted,
@@ -48,21 +61,19 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
   function handleClearFilters() {
     setFilters(DEFAULT_FILTERS);
     setDrawerOpen(false);
-    if (watchlistOnly) setSearchParams({}, { replace: true });
+    const p = new URLSearchParams(searchParams);
+    p.delete('saved');
+    p.delete('q');
+    setSearchParams(p, { replace: true });
   }
 
-  const filterActive = isFilterActive(filters);
+  const filterActive = isFilterActive(filters) || q.length > 0;
   const activeCount =
     filters.auctionStatuses.length +
     filters.Brands.length +
     filters.bodyStyles.length +
     filters.titleStatuses.length +
     filters.provinces.length;
-
-  const filterPanelProps = {
-    filters,
-    onChange: setFilters,
-  };
 
   function dismissHero() {
     sessionStorage.setItem('hero-dismissed', '1');
@@ -101,7 +112,7 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
                 </button>
               )}
             </div>
-            <FilterPanel {...filterPanelProps} />
+            <FilterPanel filters={filters} onChange={setFilters} />
           </div>
         </aside>
 
@@ -117,8 +128,8 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
               </span>
               <input
                 type="search"
-                value={filters.search}
-                onChange={(e) => { setFilters((f) => ({ ...f, search: e.target.value })); setSearchFocused(true); }}
+                value={q}
+                onChange={(e) => { setQ(e.target.value); setSearchFocused(true); }}
                 placeholder="Search by brand, model, VIN, lot…"
                 onKeyDown={handleSearchEnter}
                 onFocus={() => setSearchFocused(true)}
@@ -129,9 +140,9 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
                     : 'border-slate-300 focus:ring-blue-500 focus:border-blue-500'
                 }`}
               />
-              {searchFocused && filters.search.length > 0 && (
+              {searchFocused && q.length > 0 && (
                 <SearchSuggestions
-                  query={filters.search}
+                  query={q}
                   setFilters={setFilters}
                   onClose={() => setSearchFocused(false)}
                 />
@@ -213,7 +224,7 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
-              <FilterPanel {...filterPanelProps} />
+              <FilterPanel filters={filters} onChange={setFilters} />
             </div>
             <div className="p-4 border-t border-slate-100">
               <button
@@ -228,8 +239,6 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
       )}
 
       <CompareDrawer compareIds={compareIds} onRemove={removeCompare} onClear={clearCompare} />
-
-      {/* Push page content up so the compare bar doesn't cover cards */}
       {compareIds.length > 0 && <div className="h-20" />}
     </div>
   );

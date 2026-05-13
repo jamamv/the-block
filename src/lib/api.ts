@@ -16,7 +16,9 @@ export function clearGuestSession(): void {
 }
 
 function isNetworkError(err: unknown): boolean {
-  return err instanceof TypeError;
+  // TypeError  = fetch failed (no network / CORS)
+  // SyntaxError = got HTML instead of JSON (backend not deployed, Vercel serves index.html)
+  return err instanceof TypeError || err instanceof SyntaxError;
 }
 
 export function getToken(): string | null {
