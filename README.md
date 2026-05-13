@@ -89,6 +89,17 @@ npm run preview
 
 ## Features
 
+### At a Glance
+
+- Buyer inventory with search, filters, sorting, saved vehicles, and comparison
+- Vehicle detail pages with gallery, specs, condition report, WhatsApp sharing, bidding, and Buy Now
+- Dedicated My Bids page with active, won, lost, and purchased states
+- Seller-side List a Car form with validation and confirmation screen
+- Notifications for watched vehicles going live and bids ending soon
+- Dark mode, CAD/USD currency toggle, and English/French locale toggle
+- Auth with register/login, JWT sessions, and guest mode for frontend-only demos
+- Responsive desktop and mobile layouts with bottom navigation on small screens
+
 ### Inventory
 
 - 200 generated vehicle listings loaded from local data
@@ -98,7 +109,6 @@ npm run preview
 - Filters for auction status, brand, body style, title status, and province
 - Live filter counts
 - Sort by highest bid, lowest bid, newest year, lowest mileage, and best condition
-- Dismissible banner persisted in `sessionStorage`
 - Vehicle cards with image, badges, lot number, auction status, condition bar, bid count, reserve status, and Buy Now price
 - Market price labels such as Great Deal and High Bid based on peer median bid
 - Watchlist with heart buttons, persisted to `localStorage`
@@ -130,6 +140,16 @@ npm run preview
 - Bid state updates immediately across inventory cards, detail pages, and My Bids
 - Bid state persisted to `localStorage`
 
+### Seller Listing Flow
+
+- `/submit` form for listing a vehicle for auction review
+- Vehicle identity fields: year, brand, model, trim, body style, fuel type, transmission, drivetrain, odometer, condition grade, and title status
+- Seller/location fields: province, city, and dealership name
+- Auction pricing fields: starting bid, reserve price, and optional Buy Now price
+- Condition notes field for damage, service history, or notable details
+- Inline validation for required fields, year range, and condition grade
+- Confirmation screen after successful submission
+
 ### My Bids
 
 - Dedicated `/bids` page
@@ -154,7 +174,7 @@ npm run preview
 - Header notification bell with count badge
 - Alerts for watched vehicles going live
 - Alerts for bids ending soon
-- Alerts are sorted by urgency
+- Notification menu with urgency-based ordering
 - Empty notification state when there is nothing to act on
 
 ### Settings and Localization
@@ -163,6 +183,8 @@ npm run preview
 - Dark mode toggle persisted to `localStorage`
 - Currency toggle between CAD and USD
 - Locale toggle between English and French
+- Currency formatting updates visible prices throughout the app
+- Locale setting drives app copy through the shared `t(...)` helper
 - Central `SettingsProvider` exposes `t(...)` translations and `fmt(...)` currency formatting
 
 ### Auth and Guest Mode
@@ -177,14 +199,7 @@ npm run preview
 - Continue as Guest option for demos and frontend-only deployment
 - Guest mode allows bidding and Buy Now without the backend
 
-### Submit a Vehicle
-
-- `/submit` form for listing a vehicle
-- Fields for identity, body style, fuel, transmission, drivetrain, odometer, condition, title status, location, dealership, auction pricing, Buy Now price, and condition notes
-- Inline validation for required fields, year, and condition grade
-- Confirmation screen after successful submission
-
-### Responsive UX
+### Responsive UX and Navigation
 
 - Desktop sticky filter sidebar
 - Mobile/tablet filter drawer
