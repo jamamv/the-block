@@ -275,7 +275,7 @@ Manual flows to test:
 
 ## Time Spent
 
-Around 12-15 hours total. I started with the inventory and detail pages, then layered in bidding, auth, comparison, notifications, settings, mobile UX, and polish.
+Up to 7 hours total. I started with the inventory and detail pages, then layered in bidding, auth, comparison, notifications, settings, mobile UX, and polish.
 
 ---
 
