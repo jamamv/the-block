@@ -52,6 +52,7 @@ npm run preview
 | `npm run dev` | Start the Vite frontend |
 | `npm run server` | Start the Express API server |
 | `npm run dev:full` | Start frontend and API together |
+| `npm test` | Run the Vitest utility test suite |
 | `npm run build` | Type-check and build the production frontend |
 | `npm run preview` | Preview the production build locally |
 
@@ -266,6 +267,14 @@ I tried to make the prototype feel like something a buyer could actually use, no
 
 ## Verification
 
+Automated tests:
+
+```bash
+npm test
+```
+
+The current Vitest suite covers bid validation, auction status/countdown logic, inventory filtering/counts, and sorting behavior.
+
 Current production build check:
 
 ```bash
@@ -302,7 +311,7 @@ Up to 7 hours total. I started with the inventory and detail pages, then layered
 - Swipe-style discovery for buyers to quickly like, skip, save, or compare vehicles from a mobile-first browsing flow
 - Smarter backend matching that uses AI-assisted buyer preferences, seller inventory, budget, location, condition, and bidding behavior to recommend better seller-to-buyer matches
 - A fuller follower system where buyers can follow dealers, sellers can build an audience, and followers receive alerts when matching inventory is listed
-- Vitest coverage for filtering, sorting, auction status, bid validation, and price insight
+- Broader Vitest coverage for price insight, settings, auth helpers, and edge cases around null vehicle fields
 - Playwright flows for browse, filter, bid, Buy Now, and My Bids outcomes
 - Price range and mileage filters
 - Better loading and empty states for async/server-backed data
