@@ -206,15 +206,17 @@ function Header({
     <header className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-20 shadow-[0_1px_0_0_#f1f5f9] dark:shadow-[0_1px_0_0_#1e293b]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3">
 
-        <Link to="/" className="flex items-center gap-2 flex-shrink-0 mr-1">
-          <span className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">The Block</span>
-          <a
-            href="https://www.openlane.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-slate-300 dark:text-slate-600 font-medium hover:text-slate-500 dark:hover:text-slate-400 transition-colors"
-          >by OPENLANE</a>
-        </Link>
+        <div className="flex items-center gap-2 flex-shrink-0 mr-1">
+          <Link to="/" className="flex flex-col leading-none">
+            <span className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">The Block</span>
+            <a
+              href="https://www.openlane.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-slate-400 dark:text-slate-500 font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors mt-0.5"
+            >by OPENLANE</a>
+          </Link>
+        </div>
 
         <span className="hidden sm:block w-px h-4 bg-slate-200 dark:bg-slate-700 flex-shrink-0" />
 
