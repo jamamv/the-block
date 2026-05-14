@@ -212,7 +212,7 @@ function Header({
             href="https://www.openlane.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden lg:block text-xs text-slate-300 dark:text-slate-600 font-medium hover:text-slate-500 dark:hover:text-slate-400 transition-colors"
+            className="text-xs text-slate-300 dark:text-slate-600 font-medium hover:text-slate-500 dark:hover:text-slate-400 transition-colors"
           >by OPENLANE</a>
         </Link>
 
