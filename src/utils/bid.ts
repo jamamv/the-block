@@ -1,4 +1,4 @@
-export const MIN_BID_INCREMENT = 500;
+const MIN_BID_INCREMENT = 500;
 
 export function minimumBid(currentBid: number): number {
   return currentBid + MIN_BID_INCREMENT;

@@ -314,23 +314,123 @@ Manual flows to test:
 
 ---
 
+## Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                    Browser                       │
+│                                                  │
+│   React + Vite + TypeScript + Tailwind CSS v4    │
+│                                                  │
+│   ┌──────────────┐    ┌──────────────────────┐   │
+│   │  React State │    │     localStorage     │   │
+│   │  + Context   │    │  bids · watchlist    │   │
+│   │  (no Redux)  │    │  dealers · settings  │   │
+│   └──────────────┘    └──────────────────────┘   │
+│                                                  │
+│   static vehicle data loaded from vehicles.json  │
+└──────────────────┬──────────────────────────────┘
+                   │ JWT Bearer (auth only)
+                   ▼
+┌─────────────────────────────────────────────────┐
+│               Express API  :3001                 │
+│                                                  │
+│   POST /api/auth/register                        │
+│   POST /api/auth/login                           │
+│   GET  /api/auth/me                              │
+│                                                  │
+│   bcrypt password hashing · JWT (7-day expiry)   │
+└──────────────────┬──────────────────────────────┘
+                   │ better-sqlite3
+                   ▼
+┌─────────────────────────────────────────────────┐
+│              SQLite  data/users.db               │
+│                                                  │
+│   users (id, name, email, password_hash,         │
+│           created_at)                            │
+└─────────────────────────────────────────────────┘
+```
+
+**Buyer flow — from landing to bid:**
+
+```
+Browse inventory → Search / Filter / Sort
+        │
+        ▼
+   Vehicle card ──► Save to watchlist
+        │
+        ▼
+   Detail page ──► Image gallery · Specs · Condition report
+        │
+        ▼
+   Bid panel
+        │
+        ├── Not logged in ──► Login / Register / Guest
+        │                              │
+        │◄─────────────────────────────┘
+        │
+        ├── Enter amount ──► Validation (≥ minimum increment)
+        │
+        ├── Confirm step ──► Bid placed (optimistic, localStorage)
+        │
+        └── Buy Now ──► Confirm ──► Purchased
+                                        │
+                                        ▼
+                               /bids  (Active · Won · Lost · Purchased)
+```
+
+---
+
 ## Time Spent
 
 Up to 7 hours total. I started with the inventory and detail pages, then layered in bidding, auth, comparison, notifications, settings, mobile UX, and polish.
 
 ---
 
+## Assumptions and Scope
+
+**Included:**
+- Full buyer flow: browse, inspect, bid, Buy Now, track outcomes, save, compare
+- Auth with register, login, and guest mode for frontend-only demos
+- Seller listing form with validation (no backend persistence — form submits locally)
+- Mobile layout with bottom navigation
+- Dark mode, CAD/USD currency, and EN/FR locale
+
+**Simplified:**
+- Vehicle data is static JSON (200 generated listings). In production this would be a live database.
+- Bid state is client-side only (`localStorage`). Bids do not persist to the server or compete with other users.
+- Auction timers are normalized relative to the current time so demos always show a mix of live, upcoming, and ended auctions — they do not run on a real clock.
+- The backend is auth-only. Vehicle inventory, bids, and submissions are not persisted server-side.
+
+**Skipped:**
+- Real-time updates (WebSockets / SSE)
+- Seller dashboard or admin view
+- Payment or escrow flow
+- Proxy bidding with automatic increments
+- Image upload on vehicle submission
+
+---
+
 ## What I'd Do With More Time
 
-- Proxy bidding with max bid ceilings and tiered increments
-- Real-time bid updates through WebSockets or server-sent events
-- Persist real bids and vehicle submissions server-side
-- Swipe-style discovery for buyers to quickly like, skip, save, or compare vehicles from a mobile-first browsing flow
-- Smarter backend matching that uses AI-assisted buyer preferences, seller inventory, budget, location, condition, and bidding behavior to recommend better seller-to-buyer matches
-- A fuller follower system where buyers can follow dealers, sellers can build an audience, and followers receive alerts when matching inventory is listed
-- Broader Vitest coverage for price insight, settings, auth helpers, and edge cases around null vehicle fields
-- Playwright flows for browse, filter, bid, Buy Now, and My Bids outcomes
-- Price range and mileage filters
-- Better loading and empty states for async/server-backed data
-- Accessibility pass for focus management, modal behavior, keyboard navigation, and screen reader labels
-- Code splitting to reduce the single production JS chunk size
+**Photo uploads on vehicle listings**
+The submit form currently collects vehicle details but no images. I would add image upload directly in the listing flow — drag-and-drop or camera on mobile, stored server-side (S3 or equivalent), with a thumbnail preview before submission. Photos are the highest-signal input for buyers evaluating a used vehicle remotely.
+
+**Real auth with persistent sessions**
+Login and register work end-to-end when the backend is running, but bids and watchlist stay in `localStorage` and do not follow the user across devices. I would wire bids and saved vehicles to the backend so a buyer's session is consistent whether they are on their phone or desktop.
+
+**Dealer and seller followers**
+The follow/unfollow toggle is already in the UI but only persisted locally. I would back it with a proper followers table, so buyers receive push or in-app notifications when a followed dealer lists new inventory — turning a one-time browse into a recurring relationship.
+
+**Vehicle swap listings**
+Alongside cash auctions, sellers often want to trade rather than sell outright. I would add a swap flag on listings where a seller specifies what they are looking for, and buyers can propose their own vehicle in exchange. This opens a different kind of transaction that auction-only platforms do not support.
+
+**Smart matching from click and preference signals**
+The current inventory is a flat list. With more time I would track implicit signals — vehicles viewed, saved, time spent on detail pages, bids placed — and use them to rank inventory for each buyer. A returning buyer who consistently looks at low-mileage SUVs under $30K should see those first, not whatever sorted highest. This is the layer that turns a marketplace into something that feels personalized.
+
+**Real-time bid updates**
+Bids are currently optimistic and local. In a real auction, other buyers are bidding simultaneously. I would add WebSockets or server-sent events so the current bid and bid count refresh live on the detail page and inventory cards without a manual reload.
+
+**Broader test coverage**
+- Vitest unit tests for price insight, settings, and null-field edge cases
+- Playwright end-to-end flows covering browse → filter → bid → My Bids outcome

@@ -57,10 +57,5 @@ export function useBidState() {
     });
   }, []);
 
-  const getBidState = useCallback(
-    (vehicleId: string): BidState | undefined => bidStateMap[vehicleId],
-    [bidStateMap],
-  );
-
-  return { bidStateMap, placeBid, buyNow, retractBid, getBidState };
+  return { bidStateMap, placeBid, buyNow, retractBid };
 }
