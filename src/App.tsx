@@ -208,7 +208,12 @@ function Header({
 
         <Link to="/" className="flex items-center gap-2 flex-shrink-0 mr-1">
           <span className="text-[15px] font-bold text-slate-900 dark:text-white tracking-tight">The Block</span>
-          <span className="hidden lg:block text-xs text-slate-300 dark:text-slate-600 font-medium">by OPENLANE</span>
+          <a
+            href="https://www.openlane.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden lg:block text-xs text-slate-300 dark:text-slate-600 font-medium hover:text-slate-500 dark:hover:text-slate-400 transition-colors"
+          >by OPENLANE</a>
         </Link>
 
         <span className="hidden sm:block w-px h-4 bg-slate-200 dark:bg-slate-700 flex-shrink-0" />
@@ -489,6 +494,26 @@ function AppShell({
           <Route path="/register" element={user ? <Navigate to="/" replace /> : <RegisterPage onRegister={register} />} />
         </Routes>
       </main>
+
+      <footer className="hidden sm:block border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-900 dark:text-white">The Block</span>
+            <span className="text-slate-300 dark:text-slate-700">·</span>
+            <a
+              href="https://www.openlane.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              OPENLANE
+            </a>
+          </div>
+          <p className="text-xs text-slate-400 dark:text-slate-600">
+            © {new Date().getFullYear()} The Block. Built for the OPENLANE coding challenge.
+          </p>
+        </div>
+      </footer>
 
       <BottomNav
         bidCount={bidCount}
