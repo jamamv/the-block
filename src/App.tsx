@@ -485,6 +485,8 @@ function AppShell({
               onBuyNow={buyNow}
               onRetractBid={retractBid}
               user={user}
+              watchlist={watchlist}
+              onToggleWatch={toggleWatch}
             />
           } />
           <Route path="/submit" element={<SubmitPage />} />

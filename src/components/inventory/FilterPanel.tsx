@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import type { FilterState, BodyStyle, TitleStatus, AuctionStatusFilter } from '../../types/vehicle.ts';
 import { ALL_BrandS, ALL_PROVINCES, ALL_BODY_STYLES, vehicles } from '../../data/vehicles.ts';
 import { bodyStyleLabel, titleStatusLabel } from '../../utils/format.ts';
-import { computeFilterCounts } from '../../utils/filter.ts';
+import { computeFilterCounts, filterVehicles } from '../../utils/filter.ts';
 import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface FilterPanelProps {
@@ -92,7 +92,13 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
   const { t } = useSettings();
   const [showAllBrands, setShowAllBrands] = useState(false);
 
-  const counts = useMemo(() => computeFilterCounts(vehicles), []);
+  const counts = useMemo(() => ({
+    auctionStatuses: computeFilterCounts(filterVehicles(vehicles, { ...filters, auctionStatuses: [] })).auctionStatuses,
+    Brands:          computeFilterCounts(filterVehicles(vehicles, { ...filters, Brands: [] })).Brands,
+    bodyStyles:      computeFilterCounts(filterVehicles(vehicles, { ...filters, bodyStyles: [] })).bodyStyles,
+    titleStatuses:   computeFilterCounts(filterVehicles(vehicles, { ...filters, titleStatuses: [] })).titleStatuses,
+    provinces:       computeFilterCounts(filterVehicles(vehicles, { ...filters, provinces: [] })).provinces,
+  }), [filters]);
 
   const visibleBrands = showAllBrands ? ALL_BrandS : ALL_BrandS.slice(0, BrandS_PREVIEW);
   const hiddenCount = ALL_BrandS.length - BrandS_PREVIEW;

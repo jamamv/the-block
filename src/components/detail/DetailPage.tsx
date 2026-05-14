@@ -17,9 +17,11 @@ interface DetailPageProps {
   onBuyNow: (vehicleId: string, price: number) => void;
   onRetractBid: (vehicleId: string) => void;
   user: AuthUser | null;
+  watchlist: Set<string>;
+  onToggleWatch: (id: string) => void;
 }
 
-export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, user }: DetailPageProps) {
+export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, user, watchlist, onToggleWatch }: DetailPageProps) {
   const { fmt, t } = useSettings();
   const { id } = useParams<{ id: string }>();
   const vehicle = id ? getVehicleById(id) : undefined;
@@ -36,6 +38,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
   }
 
   const bidState = bidStateMap[vehicle.id];
+  const isWatched = watchlist.has(vehicle.id);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -65,6 +68,21 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => onToggleWatch(vehicle.id)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors ${
+              isWatched
+                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-600 hover:border-red-300 hover:text-red-500'
+            }`}
+            aria-label={isWatched ? 'Remove from saved' : 'Save to favourites'}
+          >
+            <svg className="w-4 h-4" fill={isWatched ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            {isWatched ? 'Saved' : 'Save'}
+          </button>
+
           <a
             href={`https://wa.me/?text=${encodeURIComponent(`${vehicle.year} ${vehicle.Brand} ${vehicle.model} — ${window.location.href}`)}`}
             target="_blank"
