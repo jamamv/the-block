@@ -75,6 +75,12 @@ npm run preview
 
 ---
 
+## Code Walkthrough
+
+For a file-by-file explanation of the project architecture, see [`CODEBASE_GUIDE.md`](CODEBASE_GUIDE.md).
+
+---
+
 ## Main Routes
 
 | Route | Purpose |
