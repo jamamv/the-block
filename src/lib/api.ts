@@ -98,3 +98,38 @@ export async function apiMe(): Promise<AuthUser> {
   const data = await request<{ user: AuthUser }>('/auth/me');
   return data.user;
 }
+
+// ── Bids ────────────────────────────────────────────────────────────────
+
+export interface BidState {
+  current_bid: number;
+  bid_count: number;
+  last_bid_at: string;
+  bought_now?: true;
+}
+
+export async function apiFetchBids(): Promise<Record<string, BidState>> {
+  return request<Record<string, BidState>>('/bids');
+}
+
+export async function apiPlaceBid(vehicleId: string, amount: number, boughtNow?: boolean): Promise<void> {
+  await request('/bids', { method: 'POST', body: JSON.stringify({ vehicleId, amount, boughtNow }) });
+}
+
+export async function apiRetractBid(vehicleId: string): Promise<void> {
+  await request(`/bids/${vehicleId}`, { method: 'DELETE' });
+}
+
+// ── Watchlist ────────────────────────────────────────────────────────────
+
+export async function apiFetchWatchlist(): Promise<string[]> {
+  return request<string[]>('/watchlist');
+}
+
+export async function apiWatchVehicle(vehicleId: string): Promise<void> {
+  await request(`/watchlist/${vehicleId}`, { method: 'POST' });
+}
+
+export async function apiUnwatchVehicle(vehicleId: string): Promise<void> {
+  await request(`/watchlist/${vehicleId}`, { method: 'DELETE' });
+}

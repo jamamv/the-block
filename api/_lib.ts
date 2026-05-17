@@ -17,6 +17,24 @@ export function getDb() {
         password_hash TEXT NOT NULL,
         created_at    TEXT NOT NULL DEFAULT (datetime('now'))
       );
+
+      CREATE TABLE IF NOT EXISTS bids (
+        user_id     TEXT NOT NULL,
+        vehicle_id  TEXT NOT NULL,
+        current_bid REAL NOT NULL,
+        bid_count   INTEGER NOT NULL DEFAULT 1,
+        last_bid_at TEXT NOT NULL,
+        bought_now  INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (user_id, vehicle_id),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS watchlist (
+        user_id    TEXT NOT NULL,
+        vehicle_id TEXT NOT NULL,
+        PRIMARY KEY (user_id, vehicle_id),
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      );
     `);
   }
   return _db;
@@ -40,4 +58,13 @@ export function signToken(payload: { userId: string; email: string }): string {
 
 export function verifyToken(token: string): { userId: string; email: string } {
   return jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
+}
+
+export function getUserFromHeader(authorization: string | undefined): { userId: string; email: string } | null {
+  if (!authorization?.startsWith('Bearer ')) return null;
+  try {
+    return verifyToken(authorization.slice(7));
+  } catch {
+    return null;
+  }
 }

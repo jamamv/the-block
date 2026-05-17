@@ -394,8 +394,8 @@ function BottomNav({
 
 export default function App() {
   const { user, loading, login, register, loginAsGuest, logout } = useAuth();
-  const { bidStateMap, placeBid, buyNow, retractBid } = useBidState();
-  const { watchlist, toggleWatch } = useWatchlist();
+  const { bidStateMap, placeBid, buyNow, retractBid } = useBidState(user);
+  const { watchlist, toggleWatch } = useWatchlist(user);
 
   if (loading) {
     return (

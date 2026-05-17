@@ -1,7 +1,13 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { BidState, BidStateMap } from '../types/vehicle.ts';
+import type { AuthUser } from '../lib/api.ts';
+import { apiFetchBids, apiPlaceBid, apiRetractBid } from '../lib/api.ts';
 
 const STORAGE_KEY = 'the-block:bids';
+
+function isRealUser(user: AuthUser | null): boolean {
+  return user !== null && user.id !== 'guest';
+}
 
 function loadBidStateMap(): BidStateMap {
   try {
@@ -16,29 +22,38 @@ function saveBidStateMap(map: BidStateMap): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
 }
 
-export function useBidState() {
+export function useBidState(user: AuthUser | null) {
   const [bidStateMap, setBidStateMap] = useState<BidStateMap>(loadBidStateMap);
+
+  // When a real user's session resolves, fetch their server bids and replace local state.
+  // Guest users keep localStorage only.
+  useEffect(() => {
+    if (!isRealUser(user)) return;
+    apiFetchBids().then((serverBids) => {
+      setBidStateMap(serverBids);
+      saveBidStateMap(serverBids);
+    }).catch(() => {});
+  }, [user?.id]);
 
   const placeBid = useCallback((vehicleId: string, amount: number) => {
     setBidStateMap((prev) => {
-      const prevState = prev[vehicleId];
       const updated: BidState = {
         current_bid: amount,
-        bid_count: (prevState?.bid_count ?? 0) + 1,
+        bid_count: (prev[vehicleId]?.bid_count ?? 0) + 1,
         last_bid_at: new Date().toISOString(),
       };
       const next = { ...prev, [vehicleId]: updated };
       saveBidStateMap(next);
       return next;
     });
-  }, []);
+    if (isRealUser(user)) apiPlaceBid(vehicleId, amount).catch(() => {});
+  }, [user]);
 
   const buyNow = useCallback((vehicleId: string, price: number) => {
     setBidStateMap((prev) => {
-      const prevState = prev[vehicleId];
       const updated: BidState = {
         current_bid: price,
-        bid_count: (prevState?.bid_count ?? 0) + 1,
+        bid_count: (prev[vehicleId]?.bid_count ?? 0) + 1,
         last_bid_at: new Date().toISOString(),
         bought_now: true,
       };
@@ -46,7 +61,8 @@ export function useBidState() {
       saveBidStateMap(next);
       return next;
     });
-  }, []);
+    if (isRealUser(user)) apiPlaceBid(vehicleId, price, true).catch(() => {});
+  }, [user]);
 
   const retractBid = useCallback((vehicleId: string) => {
     setBidStateMap((prev) => {
@@ -55,7 +71,8 @@ export function useBidState() {
       saveBidStateMap(next);
       return next;
     });
-  }, []);
+    if (isRealUser(user)) apiRetractBid(vehicleId).catch(() => {});
+  }, [user]);
 
   return { bidStateMap, placeBid, buyNow, retractBid };
 }
