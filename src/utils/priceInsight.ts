@@ -3,13 +3,6 @@ import { vehicles as allVehicles } from '../data/vehicles.ts';
 
 export type PriceLabel = 'great-deal' | 'fair-price' | 'high-bid';
 
-function median(nums: number[]): number {
-  const s = [...nums].sort((a, b) => a - b);
-  const m = Math.floor(s.length / 2);
-  return s.length % 2 !== 0 ? s[m] : (s[m - 1] + s[m]) / 2;
-}
-
-// Cached at module load — runs once per vehicle id
 const cache = new Map<string, PriceLabel | null>();
 
 export function getPriceLabel(vehicle: Vehicle): PriceLabel | null {
@@ -17,9 +10,12 @@ export function getPriceLabel(vehicle: Vehicle): PriceLabel | null {
   if (cache.has(cacheKey)) return cache.get(cacheKey)!;
 
   const bid = vehicle.current_bid;
-  if (bid == null) { cache.set(vehicle.id, null); return null; }
+  if (bid == null) {
+    cache.set(cacheKey, null);
+    return null;
+  }
 
-  // Prefer body_style + fuel_type match; fall back to body_style only
+  // Peer group: same body_style + fuel_type; fall back to body_style only
   let peers = allVehicles
     .filter(v => v.id !== vehicle.id && v.body_style === vehicle.body_style && v.fuel_type === vehicle.fuel_type && v.current_bid != null)
     .map(v => v.current_bid as number);
@@ -30,10 +26,19 @@ export function getPriceLabel(vehicle: Vehicle): PriceLabel | null {
       .map(v => v.current_bid as number);
   }
 
-  if (peers.length < 3) { cache.set(cacheKey, null); return null; }
+  if (peers.length < 3) {
+    cache.set(cacheKey, null);
+    return null;
+  }
 
-  const ratio = bid / median(peers);
-  const label: PriceLabel = ratio < 0.87 ? 'great-deal' : ratio > 1.13 ? 'high-bid' : 'fair-price';
+  // Percentile rank of this bid within the peer group.
+  // Bottom 25%: buyer is getting a relative deal.
+  // Top 25%: bid is running high relative to peers.
+  // Middle 50%: no badge — don't label the majority.
+  const sorted = [...peers].sort((a, b) => a - b);
+  const rank = sorted.filter(p => p < bid).length / sorted.length;
+
+  const label: PriceLabel = rank < 0.25 ? 'great-deal' : rank > 0.75 ? 'high-bid' : 'fair-price';
   cache.set(cacheKey, label);
   return label;
 }
