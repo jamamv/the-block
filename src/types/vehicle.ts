@@ -52,8 +52,11 @@ export interface FilterState {
   auctionStatuses: AuctionStatusFilter[];
   Brands: string[];
   bodyStyles: BodyStyle[];
+  fuelTypes: FuelType[];
   titleStatuses: TitleStatus[];
   provinces: string[];
+  priceMin: number | null;
+  priceMax: number | null;
 }
 
 export type SortKey =

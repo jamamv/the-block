@@ -1,4 +1,4 @@
-import type { Vehicle, FilterState, BodyStyle, TitleStatus, AuctionStatusFilter } from '../types/vehicle.ts';
+import type { Vehicle, FilterState, BodyStyle, FuelType, TitleStatus, AuctionStatusFilter } from '../types/vehicle.ts';
 import { getNormalizedAuctionStart, getAuctionStatus } from './auction.ts';
 
 export const DEFAULT_FILTERS: FilterState = {
@@ -6,8 +6,11 @@ export const DEFAULT_FILTERS: FilterState = {
   auctionStatuses: [],
   Brands: [],
   bodyStyles: [],
+  fuelTypes: [],
   titleStatuses: [],
   provinces: [],
+  priceMin: null,
+  priceMax: null,
 };
 
 export function isFilterActive(filters: FilterState): boolean {
@@ -16,8 +19,11 @@ export function isFilterActive(filters: FilterState): boolean {
     filters.auctionStatuses.length > 0 ||
     filters.Brands.length > 0 ||
     filters.bodyStyles.length > 0 ||
+    filters.fuelTypes.length > 0 ||
     filters.titleStatuses.length > 0 ||
-    filters.provinces.length > 0
+    filters.provinces.length > 0 ||
+    filters.priceMin !== null ||
+    filters.priceMax !== null
   );
 }
 
@@ -38,8 +44,13 @@ export function filterVehicles(
     }
     if (filters.Brands.length && !filters.Brands.includes(v.Brand)) return false;
     if (filters.bodyStyles.length && !filters.bodyStyles.includes(v.body_style as BodyStyle)) return false;
+    if (filters.fuelTypes.length && !filters.fuelTypes.includes(v.fuel_type as FuelType)) return false;
     if (filters.titleStatuses.length && !filters.titleStatuses.includes(v.title_status as TitleStatus)) return false;
     if (filters.provinces.length && !filters.provinces.includes(v.province)) return false;
+    // Price filters against current bid if available, otherwise starting bid
+    const effectivePrice = v.current_bid ?? v.starting_bid;
+    if (filters.priceMin !== null && effectivePrice < filters.priceMin) return false;
+    if (filters.priceMax !== null && effectivePrice > filters.priceMax) return false;
     return true;
   });
 }
@@ -48,6 +59,7 @@ export interface FilterCounts {
   auctionStatuses: Record<string, number>;
   Brands: Record<string, number>;
   bodyStyles: Record<string, number>;
+  fuelTypes: Record<string, number>;
   titleStatuses: Record<string, number>;
   provinces: Record<string, number>;
 }
@@ -58,6 +70,7 @@ export function computeFilterCounts(vehicles: Vehicle[]): FilterCounts {
     auctionStatuses: {},
     Brands: {},
     bodyStyles: {},
+    fuelTypes: {},
     titleStatuses: {},
     provinces: {},
   };
@@ -66,6 +79,7 @@ export function computeFilterCounts(vehicles: Vehicle[]): FilterCounts {
     counts.auctionStatuses[status] = (counts.auctionStatuses[status] ?? 0) + 1;
     counts.Brands[v.Brand] = (counts.Brands[v.Brand] ?? 0) + 1;
     counts.bodyStyles[v.body_style] = (counts.bodyStyles[v.body_style] ?? 0) + 1;
+    counts.fuelTypes[v.fuel_type] = (counts.fuelTypes[v.fuel_type] ?? 0) + 1;
     counts.titleStatuses[v.title_status] = (counts.titleStatuses[v.title_status] ?? 0) + 1;
     counts.provinces[v.province] = (counts.provinces[v.province] ?? 0) + 1;
   }

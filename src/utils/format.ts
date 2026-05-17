@@ -1,4 +1,4 @@
-import type { BodyStyle, TitleStatus } from '../types/vehicle.ts';
+import type { BodyStyle, TitleStatus, FuelType } from '../types/vehicle.ts';
 
 const USD_RATE = 0.73;
 
@@ -47,6 +47,16 @@ export function bodyStyleLabel(style: BodyStyle): string {
     hatchback: 'Hatchback',
   };
   return labels[style];
+}
+
+export function fuelTypeLabel(fuel: FuelType): string {
+  const labels: Record<FuelType, string> = {
+    gasoline: 'Gasoline',
+    hybrid: 'Hybrid',
+    electric: 'Electric',
+    diesel: 'Diesel',
+  };
+  return labels[fuel];
 }
 
 export function formatLot(lot: string): string {

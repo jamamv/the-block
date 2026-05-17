@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import type { FilterState, BodyStyle, TitleStatus, AuctionStatusFilter } from '../../types/vehicle.ts';
-import { ALL_BrandS, ALL_PROVINCES, ALL_BODY_STYLES, vehicles } from '../../data/vehicles.ts';
-import { bodyStyleLabel, titleStatusLabel } from '../../utils/format.ts';
+import type { FilterState, BodyStyle, FuelType, TitleStatus, AuctionStatusFilter } from '../../types/vehicle.ts';
+import { ALL_BrandS, ALL_PROVINCES, ALL_BODY_STYLES, ALL_FUEL_TYPES, vehicles } from '../../data/vehicles.ts';
+import { bodyStyleLabel, titleStatusLabel, fuelTypeLabel } from '../../utils/format.ts';
 import { computeFilterCounts, filterVehicles } from '../../utils/filter.ts';
 import { useSettings } from '../../contexts/SettingsContext.tsx';
 
@@ -53,6 +53,13 @@ const AUCTION_STATUS_CONFIG: Record<AuctionStatusFilter, StatusConfig> = {
   },
 };
 
+const FUEL_ICON: Record<FuelType, string> = {
+  gasoline: '⛽',
+  hybrid: '🔋',
+  electric: '⚡',
+  diesel: '🛢',
+};
+
 function SectionHeader({ title }: { title: string }) {
   return (
     <h3 className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5">
@@ -96,6 +103,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
     auctionStatuses: computeFilterCounts(filterVehicles(vehicles, { ...filters, auctionStatuses: [] })).auctionStatuses,
     Brands:          computeFilterCounts(filterVehicles(vehicles, { ...filters, Brands: [] })).Brands,
     bodyStyles:      computeFilterCounts(filterVehicles(vehicles, { ...filters, bodyStyles: [] })).bodyStyles,
+    fuelTypes:       computeFilterCounts(filterVehicles(vehicles, { ...filters, fuelTypes: [] })).fuelTypes,
     titleStatuses:   computeFilterCounts(filterVehicles(vehicles, { ...filters, titleStatuses: [] })).titleStatuses,
     provinces:       computeFilterCounts(filterVehicles(vehicles, { ...filters, provinces: [] })).provinces,
   }), [filters]);
@@ -105,12 +113,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
   function toggleAuctionStatus(status: AuctionStatusFilter) {
     const curr = filters.auctionStatuses;
-    onChange({
-      ...filters,
-      auctionStatuses: curr.includes(status)
-        ? curr.filter((s) => s !== status)
-        : [...curr, status],
-    });
+    onChange({ ...filters, auctionStatuses: curr.includes(status) ? curr.filter((s) => s !== status) : [...curr, status] });
   }
 
   function toggleBrand(Brand: string) {
@@ -123,6 +126,11 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
     onChange({ ...filters, bodyStyles: curr.includes(style) ? curr.filter((s) => s !== style) : [...curr, style] });
   }
 
+  function toggleFuelType(fuel: FuelType) {
+    const curr = filters.fuelTypes;
+    onChange({ ...filters, fuelTypes: curr.includes(fuel) ? curr.filter((f) => f !== fuel) : [...curr, fuel] });
+  }
+
   function toggleTitle(status: TitleStatus) {
     const curr = filters.titleStatuses;
     onChange({ ...filters, titleStatuses: curr.includes(status) ? curr.filter((s) => s !== status) : [...curr, status] });
@@ -133,9 +141,20 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
     onChange({ ...filters, provinces: curr.includes(province) ? curr.filter((p) => p !== province) : [...curr, province] });
   }
 
+  function setPriceMin(raw: string) {
+    const val = raw === '' ? null : Number(raw);
+    onChange({ ...filters, priceMin: val });
+  }
+
+  function setPriceMax(raw: string) {
+    const val = raw === '' ? null : Number(raw);
+    onChange({ ...filters, priceMax: val });
+  }
+
   return (
     <div className="space-y-5">
 
+      {/* Auction Status */}
       <div>
         <SectionHeader title={t('filter.auction_status')} />
         <div className="space-y-1.5">
@@ -167,6 +186,47 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       <div className="border-t border-slate-100 dark:border-slate-700" />
 
+      {/* Price Range */}
+      <div>
+        <SectionHeader title="Price Range" />
+        <div className="flex items-center gap-2">
+          <div className="flex-1 relative">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-sm select-none">$</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Min"
+              value={filters.priceMin ?? ''}
+              onChange={(e) => setPriceMin(e.target.value)}
+              className="w-full pl-6 pr-2 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <span className="text-slate-300 dark:text-slate-600 text-sm flex-shrink-0">—</span>
+          <div className="flex-1 relative">
+            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-sm select-none">$</span>
+            <input
+              type="number"
+              min={0}
+              placeholder="Max"
+              value={filters.priceMax ?? ''}
+              onChange={(e) => setPriceMax(e.target.value)}
+              className="w-full pl-6 pr-2 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+        {(filters.priceMin !== null || filters.priceMax !== null) && (
+          <button
+            onClick={() => onChange({ ...filters, priceMin: null, priceMax: null })}
+            className="mt-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+          >
+            Clear range
+          </button>
+        )}
+      </div>
+
+      <div className="border-t border-slate-100 dark:border-slate-700" />
+
+      {/* Brand */}
       <div>
         <SectionHeader title={t('filter.brand')} />
         <div className="space-y-0.5">
@@ -195,6 +255,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       <div className="border-t border-slate-100 dark:border-slate-700" />
 
+      {/* Body Style */}
       <div>
         <SectionHeader title={t('filter.type')} />
         <div className="space-y-0.5">
@@ -212,6 +273,25 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       <div className="border-t border-slate-100 dark:border-slate-700" />
 
+      {/* Fuel Type */}
+      <div>
+        <SectionHeader title="Fuel Type" />
+        <div className="space-y-0.5">
+          {ALL_FUEL_TYPES.map((fuel) => (
+            <CheckRow
+              key={fuel}
+              label={`${FUEL_ICON[fuel]} ${fuelTypeLabel(fuel)}`}
+              count={counts.fuelTypes[fuel] ?? 0}
+              checked={filters.fuelTypes.includes(fuel)}
+              onChange={() => toggleFuelType(fuel)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="border-t border-slate-100 dark:border-slate-700" />
+
+      {/* Title Status */}
       <div>
         <SectionHeader title={t('filter.title_status')} />
         <div className="space-y-0.5">
@@ -229,6 +309,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       <div className="border-t border-slate-100 dark:border-slate-700" />
 
+      {/* Province */}
       <div>
         <SectionHeader title={t('filter.province')} />
         <div className="space-y-0.5">

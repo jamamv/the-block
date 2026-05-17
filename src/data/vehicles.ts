@@ -1,5 +1,5 @@
 import rawVehicles from '../../data/vehicles.json';
-import type { Vehicle, BodyStyle } from '../types/vehicle.ts';
+import type { Vehicle, BodyStyle, FuelType } from '../types/vehicle.ts';
 
 export const vehicles: Vehicle[] = (rawVehicles as Vehicle[]).map((v) => ({
   ...v,
@@ -17,6 +17,8 @@ export const ALL_BODY_STYLES: BodyStyle[] = [
   'coupe',
   'hatchback',
 ];
+
+export const ALL_FUEL_TYPES: FuelType[] = ['gasoline', 'hybrid', 'electric', 'diesel'];
 
 export function getVehicleById(id: string): Vehicle | undefined {
   return vehicles.find((v) => v.id === id);
