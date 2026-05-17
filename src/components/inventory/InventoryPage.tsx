@@ -11,7 +11,6 @@ import { EmptyState } from '../ui/EmptyState.tsx';
 import { CompareDrawer } from '../ui/CompareDrawer.tsx';
 import { useComparison } from '../../hooks/useComparison.ts';
 import { SearchSuggestions } from './SearchSuggestions.tsx';
-import { useFollowedDealers } from '../../hooks/useFollowedDealers.ts';
 import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface InventoryPageProps {
@@ -33,7 +32,6 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
   const [searchConfirmed, setSearchConfirmed] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const { compareIds, toggleCompare, removeCompare, clearCompare, canAdd } = useComparison();
-  const { followedDealers, toggleFollow } = useFollowedDealers();
 
   function setQ(value: string) {
     const p = new URLSearchParams(searchParams);
@@ -92,34 +90,6 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
             </div>
             <FilterPanel filters={filters} onChange={setFilters} />
 
-            {followedDealers.size > 0 && (
-              <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-700">
-                <h3 className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2.5">
-                  {t('filter.following')}
-                </h3>
-                <div className="space-y-1">
-                  {[...followedDealers].map((dealer) => (
-                    <div key={dealer} className="flex items-center gap-1 group">
-                      <button
-                        onClick={() => setQ(dealer)}
-                        className="flex-1 text-left text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 truncate py-0.5 transition-colors"
-                      >
-                        {dealer}
-                      </button>
-                      <button
-                        onClick={() => toggleFollow(dealer)}
-                        className="opacity-0 group-hover:opacity-100 text-slate-300 dark:text-slate-600 hover:text-red-400 transition-all p-0.5"
-                        aria-label={`Unfollow ${dealer}`}
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </aside>
 

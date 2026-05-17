@@ -70,7 +70,7 @@ npm run preview
 | Backend | Node.js, Express |
 | Auth | bcrypt, JWT |
 | Database | SQLite via better-sqlite3 |
-| Persistence | localStorage for bids, watchlist, followed dealers, and settings |
+| Persistence | localStorage for bids, watchlist, and settings |
 | Deployment | Vercel frontend |
 
 ---
@@ -134,7 +134,6 @@ For a file-by-file explanation of the project architecture, see [`CODEBASE_GUIDE
 - Live auction status and countdown
 - Sticky bid panel on desktop
 - Verified dealer badge for dealers with at least five listings
-- Follow/unfollow dealer, persisted to `localStorage`
 
 ### Bidding and Buy Now
 
@@ -248,7 +247,6 @@ For production, `JWT_SECRET` should be set explicitly.
 - Auction dates are normalized relative to the current time so demos always include upcoming, live, ending-soon, and ended auctions
 - Bids are stored in `localStorage` under `the-block:bids`
 - Watchlist is stored under `the-block:watchlist`
-- Followed dealers are stored under `the-block:followed-dealers`
 - Settings are stored under `the-block:settings`
 
 ---
@@ -425,8 +423,8 @@ The submit form currently collects vehicle details but no images. I would add im
 **Real auth with persistent sessions**
 Login and register work end-to-end when the backend is running, but bids and watchlist stay in `localStorage` and do not follow the user across devices. I would wire bids and saved vehicles to the backend so a buyer's session is consistent whether they are on their phone or desktop.
 
-**Dealer and seller followers**
-The follow/unfollow toggle is already in the UI but only persisted locally. I would back it with a proper followers table, so buyers receive push or in-app notifications when a followed dealer lists new inventory — turning a one-time browse into a recurring relationship.
+**Dealer followers**
+A dealer follow system backed by a server-side followers table, so buyers receive in-app notifications when a followed dealer lists new inventory — turning a one-time browse into a recurring relationship.
 
 **Vehicle swap listings**
 Alongside cash auctions, sellers often want to trade rather than sell outright. I would add a swap flag on listings where a seller specifies what they are looking for, and buyers can propose their own vehicle in exchange. This opens a different kind of transaction that auction-only platforms do not support.

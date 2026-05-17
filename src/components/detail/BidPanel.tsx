@@ -5,7 +5,6 @@ import type { AuthUser } from '../../hooks/useAuth.ts';
 import type { AuctionStatus } from '../../hooks/useAuctionStatus.ts';
 import { validateBid, minimumBid } from '../../utils/bid.ts';
 import { ReserveBadge } from '../ui/Badge.tsx';
-import { useFollowedDealers } from '../../hooks/useFollowedDealers.ts';
 import { VERIFIED_DEALERS } from '../../data/vehicles.ts';
 import { useSettings } from '../../contexts/SettingsContext.tsx';
 
@@ -26,9 +25,7 @@ type BuyNowStep = 'idle' | 'confirm' | 'success';
 export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceBid, onBuyNow, onRetractBid, user }: BidPanelProps) {
   const { fmt, t } = useSettings();
   const location = useLocation();
-  const { followedDealers, toggleFollow } = useFollowedDealers();
   const isVerified = VERIFIED_DEALERS.has(vehicle.selling_dealership);
-  const isFollowing = followedDealers.has(vehicle.selling_dealership);
   const boughtNow = bidState?.bought_now === true;
   const currentBid = bidState?.current_bid ?? vehicle.current_bid;
   const bidCount = bidState?.bid_count ?? vehicle.bid_count;
@@ -275,16 +272,6 @@ export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceB
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{vehicle.city}, {vehicle.province}</p>
           </div>
-          <button
-            onClick={() => toggleFollow(vehicle.selling_dealership)}
-            className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-              isFollowing
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
-            }`}
-          >
-            {isFollowing ? t('bid.following') : t('bid.follow')}
-          </button>
         </div>
       </div>
 
