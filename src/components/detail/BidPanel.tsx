@@ -86,7 +86,7 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid
       <div className="space-y-1">
         <div className="flex items-baseline justify-between">
           <span className="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">{t('bid.current_bid')}</span>
-          <ReserveBadge met={reserveMet} />
+          {vehicle.reserve_price != null && <ReserveBadge met={reserveMet} />}
         </div>
         {currentBid != null
           ? <p className="text-3xl font-bold text-slate-900 dark:text-white">{fmt(currentBid)}</p>
