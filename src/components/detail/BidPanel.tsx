@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import type { Vehicle, BidState } from '../../types/vehicle.ts';
 import type { AuthUser } from '../../hooks/useAuth.ts';
+import type { AuctionStatus } from '../../hooks/useAuctionStatus.ts';
 import { validateBid, minimumBid } from '../../utils/bid.ts';
 import { ReserveBadge } from '../ui/Badge.tsx';
 import { useFollowedDealers } from '../../hooks/useFollowedDealers.ts';
@@ -11,6 +12,8 @@ import { useSettings } from '../../contexts/SettingsContext.tsx';
 interface BidPanelProps {
   vehicle: Vehicle;
   bidState?: BidState;
+  auctionStatus: AuctionStatus;
+  countdown: string;
   onPlaceBid: (vehicleId: string, amount: number) => void;
   onBuyNow: (vehicleId: string, price: number) => void;
   onRetractBid: (vehicleId: string) => void;
@@ -20,7 +23,7 @@ interface BidPanelProps {
 type BidStep = 'idle' | 'confirm' | 'success' | 'error';
 type BuyNowStep = 'idle' | 'confirm' | 'success';
 
-export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid, user }: BidPanelProps) {
+export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceBid, onBuyNow, onRetractBid, user }: BidPanelProps) {
   const { fmt, t } = useSettings();
   const location = useLocation();
   const { followedDealers, toggleFollow } = useFollowedDealers();
@@ -68,6 +71,55 @@ export function BidPanel({ vehicle, bidState, onPlaceBid, onBuyNow, onRetractBid
           <p className="text-emerald-700 dark:text-emerald-400 font-semibold text-sm">{t('bid.purchased_label')}</p>
           <p className="text-2xl font-bold text-emerald-800 dark:text-emerald-300">{currentBid != null ? fmt(currentBid) : '—'}</p>
           <p className="text-xs text-emerald-600 dark:text-emerald-500">You bought this vehicle outright.</p>
+        </div>
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{t('bid.sold_by')}</p>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{vehicle.selling_dealership}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{vehicle.city}, {vehicle.province}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (auctionStatus === 'ended') {
+    return (
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5 space-y-4">
+        <div className="rounded-lg bg-slate-100 dark:bg-slate-700/50 p-4 text-center space-y-1">
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Auction Ended</p>
+          <p className="text-3xl font-bold text-slate-900 dark:text-white">
+            {currentBid != null ? fmt(currentBid) : '—'}
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {bidCount} {bidCount === 1 ? t('misc.bid') : t('misc.bids')} · Final
+          </p>
+        </div>
+        {vehicle.reserve_price != null && (
+          <p className={`text-xs text-center font-medium ${reserveMet ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
+            {reserveMet ? 'Reserve met' : 'Reserve not met'}
+          </p>
+        )}
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{t('bid.sold_by')}</p>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{vehicle.selling_dealership}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{vehicle.city}, {vehicle.province}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (auctionStatus === 'upcoming') {
+    return (
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5 space-y-4">
+        <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 text-center space-y-1">
+          <p className="text-xs font-semibold text-blue-500 dark:text-blue-400 uppercase tracking-wide">Auction Not Started</p>
+          <p className="text-lg font-bold text-blue-700 dark:text-blue-300">{countdown}</p>
+          <p className="text-xs text-blue-500 dark:text-blue-400">{t('bid.starting')} {fmt(vehicle.starting_bid)}</p>
+        </div>
+        <div className="rounded-lg bg-slate-50 dark:bg-slate-700/50 p-3 text-sm">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{t('bid.reserve')}</p>
+          <p className="font-semibold text-slate-800 dark:text-slate-100">
+            {vehicle.reserve_price != null ? fmt(vehicle.reserve_price) : t('bid.no_reserve')}
+          </p>
         </div>
         <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">{t('bid.sold_by')}</p>
