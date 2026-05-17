@@ -188,14 +188,14 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       {/* Price Range */}
       <div>
-        <SectionHeader title="Price Range" />
+        <SectionHeader title={t('filter.price_range')} />
         <div className="flex items-center gap-2">
           <div className="flex-1 relative">
             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-sm select-none">$</span>
             <input
               type="number"
               min={0}
-              placeholder="Min"
+              placeholder={t('filter.price_min')}
               value={filters.priceMin ?? ''}
               onChange={(e) => setPriceMin(e.target.value)}
               className="w-full pl-6 pr-2 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -207,7 +207,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
             <input
               type="number"
               min={0}
-              placeholder="Max"
+              placeholder={t('filter.price_max')}
               value={filters.priceMax ?? ''}
               onChange={(e) => setPriceMax(e.target.value)}
               className="w-full pl-6 pr-2 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -219,7 +219,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
             onClick={() => onChange({ ...filters, priceMin: null, priceMax: null })}
             className="mt-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
           >
-            Clear range
+            {t('filter.clear_range')}
           </button>
         )}
       </div>
@@ -275,7 +275,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
 
       {/* Fuel Type */}
       <div>
-        <SectionHeader title="Fuel Type" />
+        <SectionHeader title={t('filter.fuel_type')} />
         <div className="space-y-0.5">
           {ALL_FUEL_TYPES.map((fuel) => (
             <CheckRow

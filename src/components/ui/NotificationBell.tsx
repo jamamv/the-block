@@ -7,12 +7,6 @@ interface NotificationBellProps {
   notifications: AuctionNotification[];
 }
 
-const TYPE_META = {
-  'bid-ending':       { dot: 'bg-red-500',    label: 'Your bid' },
-  'watchlist-live':   { dot: 'bg-red-500',    label: 'Saved · Live' },
-  'watchlist-ending': { dot: 'bg-orange-500', label: 'Saved · Ending' },
-};
-
 export function NotificationBell({ notifications }: NotificationBellProps) {
   const { t } = useSettings();
   const [open, setOpen] = useState(false);
@@ -26,6 +20,12 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
     return () => document.removeEventListener('mousedown', onDown);
   }, []);
 
+  const TYPE_META = {
+    'bid-ending':       { dot: 'bg-red-500',    label: t('notif.your_bid') },
+    'watchlist-live':   { dot: 'bg-red-500',    label: t('notif.saved_live') },
+    'watchlist-ending': { dot: 'bg-orange-500', label: t('notif.saved_ending') },
+  };
+
   const count = notifications.length;
 
   return (
@@ -33,7 +33,7 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
       <button
         onClick={() => setOpen((v) => !v)}
         className="relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400"
-        aria-label={`${count} notification${count !== 1 ? 's' : ''}`}
+        aria-label={`${count} ${t('misc.notifications').toLowerCase()}`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

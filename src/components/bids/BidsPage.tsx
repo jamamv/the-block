@@ -110,7 +110,7 @@ function BidRow({
                 <div>
                   <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-semibold mb-0.5">{t('bids.reserve')}</p>
                   <p className={`text-sm font-semibold ${reserveMet ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                    {reserveMet ? 'Met ✓' : 'Not met'}
+                    {reserveMet ? t('bids.met') : t('bids.not_met')}
                   </p>
                 </div>
               )}

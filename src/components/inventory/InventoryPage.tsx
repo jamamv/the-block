@@ -192,7 +192,7 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
                 <button
                   onClick={() => setDrawerOpen(false)}
                   className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors"
-                  aria-label="Close filters"
+                  aria-label={t('filter.close_filters')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -4,6 +4,7 @@ import type { Vehicle } from '../../types/vehicle.ts';
 import { getVehicleById } from '../../data/vehicles.ts';
 import { formatCurrency, formatOdometer } from '../../utils/format.ts';
 import { useAuctionStatus } from '../../hooks/useAuctionStatus.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface CompareDrawerProps {
   compareIds: string[];
@@ -25,35 +26,41 @@ function ConditionMini({ grade }: { grade: number }) {
 }
 
 function AuctionLabel({ auctionStart }: { auctionStart: string }) {
+  const { t } = useSettings();
   const { status, countdown } = useAuctionStatus(auctionStart);
   const colors: Record<string, string> = {
     live: 'text-red-600', 'ending-soon': 'text-orange-600', upcoming: 'text-blue-600', ended: 'text-slate-400',
   };
   const labels: Record<string, string> = {
-    live: 'Live', 'ending-soon': 'Ending Soon', upcoming: 'Upcoming', ended: 'Ended',
+    live: t('status.live'),
+    'ending-soon': t('status.ending_soon'),
+    upcoming: t('status.upcoming'),
+    ended: t('status.ended'),
   };
   return <span className={`text-sm font-medium ${colors[status]}`}>{labels[status]}{status !== 'ended' ? ` · ${countdown}` : ''}</span>;
 }
 
 type SpecRow = { label: string; render: (v: Vehicle) => React.ReactNode; key: string; cmp?: (v: Vehicle) => string | number };
 
-const SPEC_ROWS: SpecRow[] = [
-  { key: 'bid',   label: 'Current Bid',   cmp: v => v.current_bid ?? -1,   render: v => <span className="font-bold text-slate-900 text-base">{v.current_bid != null ? formatCurrency(v.current_bid) : '—'}</span> },
-  { key: 'res',   label: 'Reserve Price', cmp: v => v.reserve_price ?? -1, render: v => v.reserve_price != null ? formatCurrency(v.reserve_price) : '—' },
-  { key: 'buy',   label: 'Buy Now',       cmp: v => v.buy_now_price ?? -1, render: v => v.buy_now_price != null ? <span className="text-blue-700 font-semibold">{formatCurrency(v.buy_now_price)}</span> : <span className="text-slate-300">—</span> },
-  { key: 'sep1',  label: '',              render: () => null },
-  { key: 'year',  label: 'Year',          render: v => v.year },
-  { key: 'odo',   label: 'Odometer',      render: v => formatOdometer(v.odometer_km) },
-  { key: 'cond',  label: 'Condition',     cmp: v => v.condition_grade,     render: v => <ConditionMini grade={v.condition_grade} /> },
-  { key: 'fuel',  label: 'Fuel',          render: v => v.fuel_type.charAt(0).toUpperCase() + v.fuel_type.slice(1) },
-  { key: 'eng',   label: 'Engine',        render: v => v.engine },
-  { key: 'trans', label: 'Transmission',  render: v => v.transmission.charAt(0).toUpperCase() + v.transmission.slice(1) },
-  { key: 'drive', label: 'Drivetrain',    render: v => v.drivetrain },
-  { key: 'sep2',  label: '',              render: () => null },
-  { key: 'title', label: 'Title',         render: v => v.title_status.charAt(0).toUpperCase() + v.title_status.slice(1) },
-  { key: 'loc',   label: 'Location',      render: v => `${v.city}, ${v.province}` },
-  { key: 'status',label: 'Auction',       cmp: v => v.auction_start,       render: v => <AuctionLabel auctionStart={v.auction_start} /> },
-];
+function getSpecRows(t: (key: string) => string): SpecRow[] {
+  return [
+    { key: 'bid',   label: t('compare.current_bid'),   cmp: v => v.current_bid ?? -1,   render: v => <span className="font-bold text-slate-900 text-base">{v.current_bid != null ? formatCurrency(v.current_bid) : '—'}</span> },
+    { key: 'res',   label: t('compare.reserve_price'), cmp: v => v.reserve_price ?? -1, render: v => v.reserve_price != null ? formatCurrency(v.reserve_price) : '—' },
+    { key: 'buy',   label: t('compare.buy_now'),       cmp: v => v.buy_now_price ?? -1, render: v => v.buy_now_price != null ? <span className="text-blue-700 font-semibold">{formatCurrency(v.buy_now_price)}</span> : <span className="text-slate-300">—</span> },
+    { key: 'sep1',  label: '',                         render: () => null },
+    { key: 'year',  label: t('compare.year'),          render: v => v.year },
+    { key: 'odo',   label: t('compare.odometer'),      render: v => formatOdometer(v.odometer_km) },
+    { key: 'cond',  label: t('compare.condition'),     cmp: v => v.condition_grade,     render: v => <ConditionMini grade={v.condition_grade} /> },
+    { key: 'fuel',  label: t('compare.fuel'),          render: v => v.fuel_type.charAt(0).toUpperCase() + v.fuel_type.slice(1) },
+    { key: 'eng',   label: t('compare.engine'),        render: v => v.engine },
+    { key: 'trans', label: t('compare.transmission'),  render: v => v.transmission.charAt(0).toUpperCase() + v.transmission.slice(1) },
+    { key: 'drive', label: t('compare.drivetrain'),    render: v => v.drivetrain },
+    { key: 'sep2',  label: '',                         render: () => null },
+    { key: 'title', label: t('compare.title'),         render: v => v.title_status.charAt(0).toUpperCase() + v.title_status.slice(1) },
+    { key: 'loc',   label: t('compare.location'),      render: v => `${v.city}, ${v.province}` },
+    { key: 'status',label: t('compare.auction'),       cmp: v => v.auction_start,       render: v => <AuctionLabel auctionStart={v.auction_start} /> },
+  ];
+}
 
 function isDiff(row: SpecRow, a: Vehicle, b: Vehicle): boolean {
   if (row.key.startsWith('sep')) return false;
@@ -66,11 +73,14 @@ function isDiff(row: SpecRow, a: Vehicle, b: Vehicle): boolean {
 }
 
 export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerProps) {
+  const { t } = useSettings();
   const [expanded, setExpanded] = useState(false);
 
   const vehicles = compareIds
     .map((id) => getVehicleById(id))
     .filter((v): v is Vehicle => v != null);
+
+  const SPEC_ROWS = getSpecRows(t as (key: string) => string);
 
   if (compareIds.length === 0) return null;
 
@@ -79,7 +89,7 @@ export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerPr
       {/* Bottom bar */}
       <div className="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
-          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide hidden sm:block">Compare</span>
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide hidden sm:block">{t('misc.compare')}</span>
 
           <div className="flex items-center gap-3 flex-1">
             {[0, 1].map((i) => {
@@ -91,12 +101,12 @@ export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerPr
                       <img src={v.images[0]} className="w-10 h-7 object-cover rounded flex-shrink-0" alt="" />
                       <div className="min-w-0 hidden sm:block">
                         <p className="text-xs font-semibold text-slate-900 truncate max-w-[100px]">{v.year} {v.Brand} {v.model}</p>
-                        <p className="text-xs text-slate-500">{v.current_bid != null ? formatCurrency(v.current_bid) : 'No bids'}</p>
+                        <p className="text-xs text-slate-500">{v.current_bid != null ? formatCurrency(v.current_bid) : t('compare.no_bids')}</p>
                       </div>
                       <button
                         onClick={() => onRemove(v.id)}
                         className="text-slate-300 hover:text-red-400 transition-colors flex-shrink-0"
-                        aria-label="Remove"
+                        aria-label={t('compare.remove')}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -105,7 +115,7 @@ export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerPr
                     </div>
                   ) : (
                     <div className="flex items-center justify-center w-32 h-9 rounded-lg border-2 border-dashed border-slate-200">
-                      <span className="text-xs text-slate-300">+ Select vehicle</span>
+                      <span className="text-xs text-slate-300">{t('compare.select_vehicle')}</span>
                     </div>
                   )}
                 </div>
@@ -115,18 +125,18 @@ export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerPr
 
           <div className="flex items-center gap-2 flex-shrink-0">
             <button onClick={onClear} className="text-xs text-slate-400 hover:text-slate-600 transition-colors font-medium">
-              Clear
+              {t('compare.clear')}
             </button>
             {compareIds.length === 2 && (
               <button
                 onClick={() => setExpanded(true)}
                 className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Compare Now →
+                {t('compare.compare_now')}
               </button>
             )}
             {compareIds.length < 2 && (
-              <span className="text-xs text-slate-400">Select {2 - compareIds.length} more</span>
+              <span className="text-xs text-slate-400">{t('compare.select_more', { n: 2 - compareIds.length })}</span>
             )}
           </div>
         </div>
@@ -141,15 +151,15 @@ export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerPr
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0">
-              <h2 className="text-base font-bold text-slate-900">Side-by-Side Comparison</h2>
+              <h2 className="text-base font-bold text-slate-900">{t('compare.side_by_side')}</h2>
               <div className="flex items-center gap-3">
                 <button onClick={() => { onClear(); setExpanded(false); }} className="text-xs text-slate-400 hover:text-red-500 transition-colors font-medium">
-                  Clear all
+                  {t('compare.clear_all')}
                 </button>
                 <button
                   onClick={() => setExpanded(false)}
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-                  aria-label="Close"
+                  aria-label={t('compare.close')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

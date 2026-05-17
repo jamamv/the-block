@@ -1,26 +1,29 @@
 import type { Vehicle } from '../../types/vehicle.ts';
 import { formatOdometer, bodyStyleLabel } from '../../utils/format.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface SpecsGridProps {
   vehicle: Vehicle;
 }
 
 export function SpecsGrid({ vehicle }: SpecsGridProps) {
+  const { t } = useSettings();
+
   const specs = [
-    { label: 'Year', value: vehicle.year },
-    { label: 'Brand', value: vehicle.Brand },
-    { label: 'Model', value: vehicle.model },
-    { label: 'Trim', value: vehicle.trim },
-    { label: 'Type', value: bodyStyleLabel(vehicle.body_style) },
-    { label: 'Engine', value: vehicle.engine },
-    { label: 'Transmission', value: vehicle.transmission },
-    { label: 'Drivetrain', value: vehicle.drivetrain },
-    { label: 'Odometer', value: formatOdometer(vehicle.odometer_km) },
-    { label: 'Fuel Type', value: vehicle.fuel_type },
-    { label: 'Exterior Color', value: vehicle.exterior_color },
-    { label: 'Interior Color', value: vehicle.interior_color },
-    { label: 'Province', value: `${vehicle.city}, ${vehicle.province}` },
-    { label: 'VIN', value: vehicle.vin },
+    { label: t('specs.year'),         value: vehicle.year },
+    { label: t('specs.brand'),        value: vehicle.Brand },
+    { label: t('specs.model'),        value: vehicle.model },
+    { label: t('specs.trim'),         value: vehicle.trim },
+    { label: t('specs.type'),         value: bodyStyleLabel(vehicle.body_style) },
+    { label: t('specs.engine'),       value: vehicle.engine },
+    { label: t('specs.transmission'), value: vehicle.transmission },
+    { label: t('specs.drivetrain'),   value: vehicle.drivetrain },
+    { label: t('specs.odometer'),     value: formatOdometer(vehicle.odometer_km) },
+    { label: t('specs.fuel_type'),    value: vehicle.fuel_type },
+    { label: t('specs.exterior'),     value: vehicle.exterior_color },
+    { label: t('specs.interior'),     value: vehicle.interior_color },
+    { label: t('specs.province'),     value: `${vehicle.city}, ${vehicle.province}` },
+    { label: t('specs.vin'),          value: vehicle.vin },
   ];
 
   return (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface ImageGalleryProps {
   images: string[];
@@ -6,6 +7,7 @@ interface ImageGalleryProps {
 }
 
 export function ImageGallery({ images, alt }: ImageGalleryProps) {
+  const { t } = useSettings();
   const [active, setActive] = useState(0);
 
   const prev = () => setActive((i) => (i === 0 ? images.length - 1 : i - 1));
@@ -16,7 +18,7 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
       <div className="relative rounded-xl overflow-hidden bg-slate-100 aspect-[4/3]">
         <img
           src={images[active]}
-          alt={`${alt} — photo ${active + 1}`}
+          alt={`${alt} — ${active + 1}`}
           className="w-full h-full object-cover"
         />
         {images.length > 1 && (
@@ -24,14 +26,14 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
             <button
               onClick={prev}
               className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors"
-              aria-label="Previous photo"
+              aria-label={t('gallery.prev')}
             >
               ‹
             </button>
             <button
               onClick={next}
               className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors"
-              aria-label="Next photo"
+              aria-label={t('gallery.next')}
             >
               ›
             </button>
@@ -51,7 +53,7 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
                 i === active ? 'border-blue-600' : 'border-transparent'
               }`}
             >
-              <img src={src} alt={`${alt} thumbnail ${i + 1}`} className="w-full h-full object-cover" />
+              <img src={src} alt={`${alt} ${i + 1}`} className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

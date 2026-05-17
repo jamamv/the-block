@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { FilterState, BodyStyle } from '../../types/vehicle.ts';
 import { vehicles, ALL_BrandS, ALL_BODY_STYLES } from '../../data/vehicles.ts';
 import { getNormalizedAuctionStart, getAuctionStatus } from '../../utils/auction.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface SearchSuggestionsProps {
   query: string;
@@ -22,6 +23,8 @@ const BODY_LABELS: Record<BodyStyle, string> = {
 };
 
 export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggestionsProps) {
+  const { t } = useSettings();
+
   const suggestions = useMemo<Suggestion[]>(() => {
     const q = query.trim().toLowerCase();
     if (q.length === 0) return [];
@@ -37,37 +40,37 @@ export function SearchSuggestions({ query, setFilters, onClose }: SearchSuggesti
     ).length;
 
     if (liveCount > 0 && 'live auction'.includes(q)) {
-      result.push({ id: 'status-live', icon: 'status', label: 'Live Auctions', sublabel: `${liveCount} vehicles`, patch: { auctionStatuses: ['live'] } });
+      result.push({ id: 'status-live', icon: 'status', label: t('search.live_label'), sublabel: t('search.n_vehicles', { n: liveCount }), patch: { auctionStatuses: ['live'] } });
     }
     if (endingCount > 0 && 'ending soon'.includes(q)) {
-      result.push({ id: 'status-ending', icon: 'status', label: 'Ending Soon', sublabel: `${endingCount} vehicles`, patch: { auctionStatuses: ['ending-soon'] } });
+      result.push({ id: 'status-ending', icon: 'status', label: t('search.ending_label'), sublabel: t('search.n_vehicles', { n: endingCount }), patch: { auctionStatuses: ['ending-soon'] } });
     }
 
     if (q.length >= 2 && 'electric'.includes(q)) {
       const count = vehicles.filter((v) => v.fuel_type === 'electric').length;
-      if (count > 0) result.push({ id: 'fuel-electric', icon: 'fuel', label: 'Electric Vehicles', sublabel: `${count} vehicles`, patch: {} });
+      if (count > 0) result.push({ id: 'fuel-electric', icon: 'fuel', label: t('search.electric'), sublabel: t('search.n_vehicles', { n: count }), patch: {} });
     }
     if (q.length >= 3 && 'hybrid'.includes(q)) {
       const count = vehicles.filter((v) => v.fuel_type === 'hybrid').length;
-      if (count > 0) result.push({ id: 'fuel-hybrid', icon: 'fuel', label: 'Hybrid Vehicles', sublabel: `${count} vehicles`, patch: {} });
+      if (count > 0) result.push({ id: 'fuel-hybrid', icon: 'fuel', label: t('search.hybrid'), sublabel: t('search.n_vehicles', { n: count }), patch: {} });
     }
 
     const brandMatches = ALL_BrandS.filter((b) => b.toLowerCase().includes(q));
     for (const brand of brandMatches.slice(0, 3)) {
       const count = vehicles.filter((v) => v.Brand === brand).length;
-      result.push({ id: `brand-${brand}`, icon: 'brand', label: brand, sublabel: `${count} vehicles`, patch: { Brands: [brand] } });
+      result.push({ id: `brand-${brand}`, icon: 'brand', label: brand, sublabel: t('search.n_vehicles', { n: count }), patch: { Brands: [brand] } });
     }
 
     for (const bs of ALL_BODY_STYLES) {
       const label = BODY_LABELS[bs];
       if (bs.includes(q) || label.toLowerCase().includes(q)) {
         const count = vehicles.filter((v) => v.body_style === bs).length;
-        result.push({ id: `body-${bs}`, icon: 'body', label, sublabel: `${count} vehicles`, patch: { bodyStyles: [bs] } });
+        result.push({ id: `body-${bs}`, icon: 'body', label, sublabel: t('search.n_vehicles', { n: count }), patch: { bodyStyles: [bs] } });
       }
     }
 
     return result.slice(0, 6);
-  }, [query]);
+  }, [query, t]);
 
   if (suggestions.length === 0) return null;
 

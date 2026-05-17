@@ -30,7 +30,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
   if (!vehicle) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <p className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">Vehicle not found</p>
+        <p className="text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">{t('detail.not_found')}</p>
         <Link to="/" className="text-blue-600 hover:underline text-sm">
           ← {t('nav.inventory')}
         </Link>
@@ -74,17 +74,17 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
           <ImageGallery images={vehicle.images} alt={`${vehicle.year} ${vehicle.Brand} ${vehicle.model}`} />
 
           <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Specifications</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4">{t('detail.specs')}</h2>
             <SpecsGrid vehicle={vehicle} />
           </section>
 
           <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Condition</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-4">{t('detail.condition')}</h2>
             <ConditionPanel vehicle={vehicle} />
           </section>
 
           <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-5">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-3">Auction Details</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white mb-3">{t('detail.auction_details')}</h2>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{t('bid.starting')}</p>
@@ -103,7 +103,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
                 </div>
               )}
               <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">Auction Start</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{t('detail.auction_start')}</p>
                 <p className="font-semibold text-slate-800 dark:text-slate-100">
                   {new Date(vehicle.auction_start).toLocaleDateString('en-CA', {
                     month: 'short',
@@ -141,7 +141,7 @@ export function DetailPage({ bidStateMap, onPlaceBid, onBuyNow, onRetractBid, us
                 <svg className="w-4 h-4 flex-shrink-0" fill={isWatched ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
-                {isWatched ? 'Saved' : 'Save'}
+                {isWatched ? t('detail.saved') : t('detail.save')}
               </button>
 
               <a

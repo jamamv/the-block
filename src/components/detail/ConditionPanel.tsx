@@ -1,11 +1,13 @@
 import type { Vehicle } from '../../types/vehicle.ts';
 import { conditionLabel, conditionColor } from '../../utils/format.ts';
+import { useSettings } from '../../contexts/SettingsContext.tsx';
 
 interface ConditionPanelProps {
   vehicle: Vehicle;
 }
 
 export function ConditionPanel({ vehicle }: ConditionPanelProps) {
+  const { t } = useSettings();
   const pct = Math.round((vehicle.condition_grade / 5) * 100);
 
   return (
@@ -22,7 +24,7 @@ export function ConditionPanel({ vehicle }: ConditionPanelProps) {
           <p className={`text-base font-semibold ${conditionColor(vehicle.condition_grade)}`}>
             {conditionLabel(vehicle.condition_grade)}
           </p>
-          <p className="text-xs text-slate-500">out of 5.0</p>
+          <p className="text-xs text-slate-500">{t('detail.out_of_5')}</p>
           <div className="mt-1.5 w-40 h-2 rounded-full bg-slate-200">
             <div
               className="h-full rounded-full bg-blue-500 transition-all"
@@ -34,7 +36,7 @@ export function ConditionPanel({ vehicle }: ConditionPanelProps) {
 
       <div>
         <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">
-          Inspector Report
+          {t('detail.inspector_report')}
         </h4>
         <p className="text-sm text-slate-700 leading-relaxed">{vehicle.condition_report}</p>
       </div>
@@ -42,7 +44,7 @@ export function ConditionPanel({ vehicle }: ConditionPanelProps) {
       {vehicle.damage_notes.length > 0 && (
         <div>
           <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">
-            Damage Notes
+            {t('detail.damage_notes')}
           </h4>
           <ul className="space-y-1">
             {vehicle.damage_notes.map((note, i) => (
@@ -57,7 +59,7 @@ export function ConditionPanel({ vehicle }: ConditionPanelProps) {
 
       {vehicle.damage_notes.length === 0 && (
         <p className="text-sm text-emerald-600 flex items-center gap-1">
-          <span>✓</span> No damage notes reported
+          <span>✓</span> {t('detail.no_damage')}
         </p>
       )}
     </div>
