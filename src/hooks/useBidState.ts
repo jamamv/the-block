@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { BidState, BidStateMap } from '../types/vehicle.ts';
 import type { AuthUser } from '../lib/api.ts';
 import { apiFetchBids, apiPlaceBid, apiRetractBid } from '../lib/api.ts';
+import { getVehicleById } from '../data/vehicles.ts';
 
 const STORAGE_KEY = 'the-block:bids';
 
@@ -37,9 +38,10 @@ export function useBidState(user: AuthUser | null) {
 
   const placeBid = useCallback((vehicleId: string, amount: number) => {
     setBidStateMap((prev) => {
+      const staticCount = getVehicleById(vehicleId)?.bid_count ?? 0;
       const updated: BidState = {
         current_bid: amount,
-        bid_count: (prev[vehicleId]?.bid_count ?? 0) + 1,
+        bid_count: prev[vehicleId] ? prev[vehicleId].bid_count : staticCount + 1,
         last_bid_at: new Date().toISOString(),
       };
       const next = { ...prev, [vehicleId]: updated };
@@ -51,9 +53,10 @@ export function useBidState(user: AuthUser | null) {
 
   const buyNow = useCallback((vehicleId: string, price: number) => {
     setBidStateMap((prev) => {
+      const staticCount = getVehicleById(vehicleId)?.bid_count ?? 0;
       const updated: BidState = {
         current_bid: price,
-        bid_count: (prev[vehicleId]?.bid_count ?? 0) + 1,
+        bid_count: prev[vehicleId] ? prev[vehicleId].bid_count : staticCount + 1,
         last_bid_at: new Date().toISOString(),
         bought_now: true,
       };
