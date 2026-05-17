@@ -1,4 +1,10 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 import { BrowserRouter, Routes, Route, Link, NavLink, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useBidState } from './hooks/useBidState.ts';
 import { useAuth } from './hooks/useAuth.ts';
@@ -462,6 +468,7 @@ function AppShell({
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F5F7] dark:bg-slate-900 transition-colors">
+      <ScrollToTop />
       <Header
         bidStateMap={bidStateMap}
         watchlist={watchlist}
