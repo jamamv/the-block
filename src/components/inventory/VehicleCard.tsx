@@ -102,12 +102,14 @@ export function VehicleCard({ vehicle, bidState, isWatched, onToggleWatch, isInC
           <div className="flex items-end justify-between mt-auto pt-2 border-t border-slate-100 dark:border-slate-700">
             <div>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {bidCount} {bidCount === 1 ? t('misc.bid') : t('misc.bids')}
-                {reserveMet && <span className="ml-1 text-emerald-600 dark:text-emerald-400 font-medium">· {t('misc.reserve_met')}</span>}
+                {currentBid != null
+                  ? <>{bidCount} {bidCount === 1 ? t('misc.bid') : t('misc.bids')}{reserveMet && <span className="ml-1 text-emerald-600 dark:text-emerald-400 font-medium">· {t('misc.reserve_met')}</span>}</>
+                  : 'Starting at'
+                }
               </p>
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-xl font-bold text-slate-900 dark:text-white leading-tight">
-                  {currentBid != null ? fmt(currentBid) : '—'}
+                  {fmt(currentBid ?? vehicle.starting_bid)}
                 </p>
                 {priceBadge && priceBadgeText && (
                   <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${priceBadge.className}`}>
