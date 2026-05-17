@@ -22,7 +22,7 @@ export function ConditionPanel({ vehicle }: ConditionPanelProps) {
         </div>
         <div>
           <p className={`text-base font-semibold ${conditionColor(vehicle.condition_grade)}`}>
-            {conditionLabel(vehicle.condition_grade)}
+            {conditionLabel(vehicle.condition_grade, t)}
           </p>
           <p className="text-xs text-slate-500">{t('detail.out_of_5')}</p>
           <div className="mt-1.5 w-40 h-2 rounded-full bg-slate-200">

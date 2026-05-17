@@ -18,12 +18,13 @@ function Badge({ children, className = '' }: BadgeProps) {
 }
 
 export function TitleBadge({ status }: { status: TitleStatus }) {
+  const { t } = useSettings();
   const styles: Record<TitleStatus, string> = {
     clean: 'bg-emerald-100 text-emerald-700',
     rebuilt: 'bg-amber-100 text-amber-700',
     salvage: 'bg-red-100 text-red-700',
   };
-  return <Badge className={styles[status]}>{titleStatusLabel(status)}</Badge>;
+  return <Badge className={styles[status]}>{titleStatusLabel(status, t)}</Badge>;
 }
 
 export function FuelBadge({ fuel }: { fuel: FuelType }) {

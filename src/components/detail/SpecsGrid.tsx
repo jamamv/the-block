@@ -14,7 +14,7 @@ export function SpecsGrid({ vehicle }: SpecsGridProps) {
     { label: t('specs.brand'),        value: vehicle.Brand },
     { label: t('specs.model'),        value: vehicle.model },
     { label: t('specs.trim'),         value: vehicle.trim },
-    { label: t('specs.type'),         value: bodyStyleLabel(vehicle.body_style) },
+    { label: t('specs.type'),         value: bodyStyleLabel(vehicle.body_style, t) },
     { label: t('specs.engine'),       value: vehicle.engine },
     { label: t('specs.transmission'), value: vehicle.transmission },
     { label: t('specs.drivetrain'),   value: vehicle.drivetrain },

@@ -262,7 +262,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
           {ALL_BODY_STYLES.map((style) => (
             <CheckRow
               key={style}
-              label={bodyStyleLabel(style)}
+              label={bodyStyleLabel(style, t)}
               count={counts.bodyStyles[style] ?? 0}
               checked={filters.bodyStyles.includes(style)}
               onChange={() => toggleBodyStyle(style)}
@@ -280,7 +280,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
           {ALL_FUEL_TYPES.map((fuel) => (
             <CheckRow
               key={fuel}
-              label={`${FUEL_ICON[fuel]} ${fuelTypeLabel(fuel)}`}
+              label={`${FUEL_ICON[fuel]} ${fuelTypeLabel(fuel, t)}`}
               count={counts.fuelTypes[fuel] ?? 0}
               checked={filters.fuelTypes.includes(fuel)}
               onChange={() => toggleFuelType(fuel)}
@@ -298,7 +298,7 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
           {TITLE_STATUSES.map((status) => (
             <CheckRow
               key={status}
-              label={titleStatusLabel(status)}
+              label={titleStatusLabel(status, t)}
               count={counts.titleStatuses[status] ?? 0}
               checked={filters.titleStatuses.includes(status)}
               onChange={() => toggleTitle(status)}

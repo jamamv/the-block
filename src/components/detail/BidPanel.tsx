@@ -43,7 +43,7 @@ export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceB
   function handleBidSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
     const amount = Number(inputValue.replace(/[^0-9]/g, ''));
-    const err = validateBid(amount, currentBid ?? 0);
+    const err = validateBid(amount, currentBid ?? 0, t);
     if (err) { setErrorMsg(err); setBidStep('error'); return; }
     setPendingAmount(amount);
     setBidStep('confirm');

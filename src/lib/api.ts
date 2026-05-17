@@ -101,12 +101,7 @@ export async function apiMe(): Promise<AuthUser> {
 
 // ── Bids ────────────────────────────────────────────────────────────────
 
-export interface BidState {
-  current_bid: number;
-  bid_count: number;
-  last_bid_at: string;
-  bought_now?: true;
-}
+import type { BidState } from '../types/vehicle.ts';
 
 export async function apiFetchBids(): Promise<Record<string, BidState>> {
   return request<Record<string, BidState>>('/bids');

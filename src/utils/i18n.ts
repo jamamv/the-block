@@ -263,6 +263,34 @@ const en = {
   'submit.required': 'Required',
   'submit.valid_year': 'Enter a valid year',
   'submit.valid_grade': '1.0 – 5.0',
+
+  'auction.starts_in': 'Starts in {time}',
+  'auction.ends_in': 'Ends in {time}',
+
+  'bid.err_invalid': 'Please enter a valid amount.',
+  'bid.err_minimum': 'Minimum bid is {amount}.',
+
+  'condition.excellent': 'Excellent',
+  'condition.good': 'Good',
+  'condition.fair': 'Fair',
+  'condition.poor': 'Poor',
+
+  'title.clean': 'Clean',
+  'title.rebuilt': 'Rebuilt',
+  'title.salvage': 'Salvage',
+
+  'body.suv': 'SUV',
+  'body.sedan': 'Sedan',
+  'body.truck': 'Truck',
+  'body.coupe': 'Coupe',
+  'body.hatchback': 'Hatchback',
+
+  'fuel.gasoline': 'Gasoline',
+  'fuel.hybrid': 'Hybrid',
+  'fuel.electric': 'Electric',
+  'fuel.diesel': 'Diesel',
+
+  'notif.live_now': 'Live now',
 };
 
 const fr: typeof en = {
@@ -528,6 +556,34 @@ const fr: typeof en = {
   'submit.required': 'Requis',
   'submit.valid_year': 'Entrez une année valide',
   'submit.valid_grade': '1,0 – 5,0',
+
+  'auction.starts_in': 'Commence dans {time}',
+  'auction.ends_in': 'Se termine dans {time}',
+
+  'bid.err_invalid': 'Veuillez saisir un montant valide.',
+  'bid.err_minimum': "L'enchère minimale est de {amount}.",
+
+  'condition.excellent': 'Excellent',
+  'condition.good': 'Bon',
+  'condition.fair': 'Passable',
+  'condition.poor': 'Mauvais',
+
+  'title.clean': 'Propre',
+  'title.rebuilt': 'Reconstruit',
+  'title.salvage': 'Épave',
+
+  'body.suv': 'VUS',
+  'body.sedan': 'Berline',
+  'body.truck': 'Camionnette',
+  'body.coupe': 'Coupé',
+  'body.hatchback': 'Hayon',
+
+  'fuel.gasoline': 'Essence',
+  'fuel.hybrid': 'Hybride',
+  'fuel.electric': 'Électrique',
+  'fuel.diesel': 'Diesel',
+
+  'notif.live_now': 'En direct',
 };
 
 const translations = { en, fr };

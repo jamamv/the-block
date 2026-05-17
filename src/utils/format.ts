@@ -1,4 +1,7 @@
 import type { BodyStyle, TitleStatus, FuelType } from '../types/vehicle.ts';
+import { getT } from './i18n.ts';
+
+type TFn = ReturnType<typeof getT>;
 
 const USD_RATE = 0.73;
 
@@ -15,11 +18,11 @@ export function formatOdometer(km: number): string {
   return `${km.toLocaleString('en-CA')} km`;
 }
 
-export function conditionLabel(grade: number): string {
-  if (grade >= 4.5) return 'Excellent';
-  if (grade >= 3.5) return 'Good';
-  if (grade >= 2.5) return 'Fair';
-  return 'Poor';
+export function conditionLabel(grade: number, t: TFn = getT('en')): string {
+  if (grade >= 4.5) return t('condition.excellent');
+  if (grade >= 3.5) return t('condition.good');
+  if (grade >= 2.5) return t('condition.fair');
+  return t('condition.poor');
 }
 
 export function conditionColor(grade: number): string {
@@ -29,34 +32,34 @@ export function conditionColor(grade: number): string {
   return 'text-red-600';
 }
 
-export function titleStatusLabel(status: TitleStatus): string {
-  const labels: Record<TitleStatus, string> = {
-    clean: 'Clean',
-    rebuilt: 'Rebuilt',
-    salvage: 'Salvage',
+export function titleStatusLabel(status: TitleStatus, t: TFn = getT('en')): string {
+  const keys: Record<TitleStatus, 'title.clean' | 'title.rebuilt' | 'title.salvage'> = {
+    clean: 'title.clean',
+    rebuilt: 'title.rebuilt',
+    salvage: 'title.salvage',
   };
-  return labels[status];
+  return t(keys[status]);
 }
 
-export function bodyStyleLabel(style: BodyStyle): string {
-  const labels: Record<BodyStyle, string> = {
-    suv: 'SUV',
-    sedan: 'Sedan',
-    truck: 'Truck',
-    coupe: 'Coupe',
-    hatchback: 'Hatchback',
+export function bodyStyleLabel(style: BodyStyle, t: TFn = getT('en')): string {
+  const keys: Record<BodyStyle, 'body.suv' | 'body.sedan' | 'body.truck' | 'body.coupe' | 'body.hatchback'> = {
+    suv: 'body.suv',
+    sedan: 'body.sedan',
+    truck: 'body.truck',
+    coupe: 'body.coupe',
+    hatchback: 'body.hatchback',
   };
-  return labels[style];
+  return t(keys[style]);
 }
 
-export function fuelTypeLabel(fuel: FuelType): string {
-  const labels: Record<FuelType, string> = {
-    gasoline: 'Gasoline',
-    hybrid: 'Hybrid',
-    electric: 'Electric',
-    diesel: 'Diesel',
+export function fuelTypeLabel(fuel: FuelType, t: TFn = getT('en')): string {
+  const keys: Record<FuelType, 'fuel.gasoline' | 'fuel.hybrid' | 'fuel.electric' | 'fuel.diesel'> = {
+    gasoline: 'fuel.gasoline',
+    hybrid: 'fuel.hybrid',
+    electric: 'fuel.electric',
+    diesel: 'fuel.diesel',
   };
-  return labels[fuel];
+  return t(keys[fuel]);
 }
 
 export function formatLot(lot: string): string {

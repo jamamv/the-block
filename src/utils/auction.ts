@@ -1,4 +1,7 @@
 import rawVehicles from '../../data/vehicles.json';
+import { getT } from './i18n.ts';
+
+type TFn = ReturnType<typeof getT>;
 
 // Compute the original timestamp range once from the dataset
 const timestamps = (rawVehicles as Array<{ auction_start: string }>).map(
@@ -37,6 +40,7 @@ export function getCountdownText(
   normalizedStart: Date,
   status: AuctionStatus,
   now = Date.now(),
+  t: TFn = getT('en'),
 ): string {
   const start = normalizedStart.getTime();
   const end = start + AUCTION_DURATION_MS;
@@ -49,7 +53,7 @@ export function getCountdownText(
     return '< 1m';
   };
 
-  if (status === 'upcoming') return `Starts in ${fmt(start - now)}`;
-  if (status === 'live' || status === 'ending-soon') return `Ends in ${fmt(end - now)}`;
-  return 'Ended';
+  if (status === 'upcoming') return t('auction.starts_in', { time: fmt(start - now) });
+  if (status === 'live' || status === 'ending-soon') return t('auction.ends_in', { time: fmt(end - now) });
+  return t('status.ended');
 }

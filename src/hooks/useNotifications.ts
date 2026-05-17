@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import type { BidStateMap } from '../types/vehicle.ts';
 import { vehicles } from '../data/vehicles.ts';
 import { getNormalizedAuctionStart, getAuctionStatus, getCountdownText } from '../utils/auction.ts';
+import { useSettings } from '../contexts/SettingsContext.tsx';
 
 export interface AuctionNotification {
   id: string;
@@ -19,6 +20,7 @@ const PRIORITY: Record<AuctionNotification['type'], number> = {
 };
 
 export function useNotifications(bidStateMap: BidStateMap, watchlist: Set<string>): AuctionNotification[] {
+  const { t } = useSettings();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export function useNotifications(bidStateMap: BidStateMap, watchlist: Set<string
           vehicleId: v.id,
           type: 'bid-ending',
           title: `${v.year} ${v.Brand} ${v.model}`,
-          countdown: getCountdownText(start, status, now),
+          countdown: getCountdownText(start, status, now, t),
           image: v.images[0],
         });
       } else if (inWatch && !inBids) {
@@ -51,7 +53,7 @@ export function useNotifications(bidStateMap: BidStateMap, watchlist: Set<string
             vehicleId: v.id,
             type: 'watchlist-live',
             title: `${v.year} ${v.Brand} ${v.model}`,
-            countdown: 'Live now',
+            countdown: t('notif.live_now'),
             image: v.images[0],
           });
         } else if (status === 'ending-soon') {
@@ -60,7 +62,7 @@ export function useNotifications(bidStateMap: BidStateMap, watchlist: Set<string
             vehicleId: v.id,
             type: 'watchlist-ending',
             title: `${v.year} ${v.Brand} ${v.model}`,
-            countdown: getCountdownText(start, status, now),
+            countdown: getCountdownText(start, status, now, t),
             image: v.images[0],
           });
         }
@@ -68,5 +70,5 @@ export function useNotifications(bidStateMap: BidStateMap, watchlist: Set<string
     }
 
     return notes.sort((a, b) => PRIORITY[a.type] - PRIORITY[b.type]);
-  }, [bidStateMap, watchlist, now]);
+  }, [bidStateMap, watchlist, now, t]);
 }

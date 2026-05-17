@@ -1,13 +1,5 @@
 import type { Vehicle, BidStateMap, SortKey } from '../types/vehicle.ts';
 
-export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: 'bid_desc', label: 'Highest Bid' },
-  { value: 'bid_asc',  label: 'Lowest Bid' },
-  { value: 'year_desc', label: 'Newest First' },
-  { value: 'odometer_asc', label: 'Low Mileage' },
-  { value: 'condition_desc', label: 'Best Condition' },
-];
-
 function currentBid(vehicle: Vehicle, bidStateMap: BidStateMap): number {
   return bidStateMap[vehicle.id]?.current_bid ?? vehicle.current_bid ?? 0;
 }
