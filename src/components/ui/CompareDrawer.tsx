@@ -87,7 +87,7 @@ export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerPr
   return (
     <>
       {/* Bottom bar */}
-      <div className="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-xl">
+      <div className="fixed bottom-16 sm:bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide hidden sm:block">{t('misc.compare')}</span>
 
@@ -105,7 +105,7 @@ export function CompareDrawer({ compareIds, onRemove, onClear }: CompareDrawerPr
                       </div>
                       <button
                         onClick={() => onRemove(v.id)}
-                        className="text-slate-300 hover:text-red-400 transition-colors flex-shrink-0"
+                        className="text-slate-400 hover:text-red-500 transition-colors flex-shrink-0 p-1 -mr-1"
                         aria-label={t('compare.remove')}
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

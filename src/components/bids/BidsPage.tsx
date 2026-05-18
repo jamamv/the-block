@@ -98,7 +98,7 @@ function BidRow({
             )}
           </div>
 
-          <div className="flex items-end justify-between gap-3 mt-auto">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mt-auto">
             <div className="flex items-center gap-4">
               <div>
                 <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wide font-semibold mb-0.5">{t('bids.your_bid')}</p>

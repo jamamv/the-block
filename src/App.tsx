@@ -15,6 +15,7 @@ import { SettingsProvider } from './contexts/SettingsContext.tsx';
 import { Header } from './components/layout/Header.tsx';
 import { BottomNav } from './components/layout/BottomNav.tsx';
 import { LoadingScreen } from './components/layout/LoadingScreen.tsx';
+import { WelcomeModal } from './components/layout/WelcomeModal.tsx';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -91,6 +92,7 @@ function AppShell({
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F5F7] dark:bg-slate-900 transition-colors">
       <ScrollToTop />
+      <WelcomeModal user={user} />
       <Header
         bidStateMap={bidStateMap}
         watchlist={watchlist}

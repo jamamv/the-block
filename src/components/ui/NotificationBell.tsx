@@ -13,11 +13,15 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function onDown(e: MouseEvent) {
+    function onDown(e: MouseEvent | TouchEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
+    document.addEventListener('mousedown', onDown as EventListener);
+    document.addEventListener('touchstart', onDown as EventListener, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', onDown as EventListener);
+      document.removeEventListener('touchstart', onDown as EventListener);
+    };
   }, []);
 
   const TYPE_META = {
@@ -51,7 +55,7 @@ export function NotificationBell({ notifications }: NotificationBellProps) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 z-30 overflow-hidden">
+        <div className="fixed inset-x-0 top-14 z-50 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80 sm:rounded-xl sm:z-30 bg-white dark:bg-slate-800 shadow-lg border-t sm:border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">{t('misc.notifications')}</p>
             {count > 0 && <span className="text-xs text-slate-400 dark:text-slate-500">{t('misc.n_active', { n: count })}</span>}

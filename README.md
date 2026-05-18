@@ -435,6 +435,15 @@ The current inventory is a flat list. With more time I would track implicit sign
 **Real-time bid updates**
 Bids are currently optimistic and local. In a real auction, other buyers are bidding simultaneously. I would add WebSockets or server-sent events so the current bid and bid count refresh live on the detail page and inventory cards without a manual reload.
 
+**Interactive map for vehicle locations**
+Listings currently show city and province as text. An interactive map layer — clustering vehicle pins by region, filterable by auction status — would let buyers visually browse inventory by geography and identify nearby vehicles without reading through cards. Especially useful for buyers who factor in transport cost or want to inspect before bidding.
+
+**AI assistant for buyers**
+An in-app assistant that answers natural-language questions about a specific listing ("Is this a good deal for a 2020 RAV4 in Ontario?" or "What should I know about rebuilt titles?") and surfaces relevant inventory based on what the buyer describes. Buyers on high-stakes purchases tend to trust a conversational recommendation loop more than a filter panel, and an assistant lowers the barrier for first-time auction buyers who are unsure how the process works.
+
+**Social layer — follow buyers and sellers, in-app chat**
+Buyers could follow dealers they trust and receive a notification when that dealer lists new inventory. Sellers could follow active buyers to understand demand. Direct in-app messaging between a buyer and a followed dealer — asking about a vehicle's history, negotiating a reserve, or coordinating inspection — would bring the relationship that currently happens over phone or WhatsApp inside the platform where it can be tracked and trusted.
+
 **Broader test coverage**
 - Vitest unit tests for price insight, settings, and null-field edge cases
 - Playwright end-to-end flows covering browse → filter → bid → My Bids outcome
