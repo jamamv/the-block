@@ -65,12 +65,13 @@ There are no real-time updates. Bid counts reflect state at page load and update
 
 ## What's Next
 
-1. **Wire bids and watchlist to the backend.** This closes the auth gap and makes sessions meaningful across devices. Everything downstream depends on bids being real data.
-2. **Real-time bid updates via WebSockets or SSE.** Bid counts and current bids on the detail page should reflect live activity from other buyers.
-3. **Image upload on `/submit`.** Photos are the highest-signal input for a remote buyer — drag-and-drop to S3 with a thumbnail preview before submission.
-4. **Playwright end-to-end coverage.** Browse → filter → bid → My Bids outcome. The unit tests cover business logic; the missing layer is full-flow confidence.
-
-Further out: an interactive map for browsing inventory by location, an AI assistant for answering buyer questions about specific listings, and a social layer — dealer follows and in-app messaging — so the relationship between buyer and seller stays on the platform.
+- **Wire bids and watchlist to the backend.** This closes the auth gap and makes sessions meaningful across devices. Everything downstream depends on bids being real data.
+- **Real-time bid updates via WebSockets or SSE.** Bid counts and current bids on the detail page should reflect live activity from other buyers.
+- **Image upload on `/submit`.** Photos are the highest-signal input for a remote buyer — drag-and-drop to S3 with a thumbnail preview before submission.
+- **Playwright end-to-end coverage.** Browse → filter → bid → My Bids outcome. The unit tests cover business logic; the missing layer is full-flow confidence.
+- **Interactive map.** Cluster vehicle pins by region, filterable by auction status. Buyers who factor in transport cost or want to inspect in person need geography, not just city text.
+- **AI assistant.** Natural-language Q&A on specific listings — "Is this a good deal for a 2020 RAV4 in Ontario?" or "What should I know about a rebuilt title?" Buyers on high-stakes purchases trust a conversational loop more than a filter panel, and it lowers the barrier for first-time auction buyers.
+- **Social layer — follows and in-app chat.** Buyers follow dealers they trust and get notified when new inventory lands. Direct messaging between buyer and seller keeps the conversation on the platform instead of moving to WhatsApp, where it can't be tracked or trusted.
 
 ---
 
