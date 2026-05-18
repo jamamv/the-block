@@ -11,6 +11,9 @@ export const DEFAULT_FILTERS: FilterState = {
   provinces: [],
   priceMin: null,
   priceMax: null,
+  yearMin: null,
+  yearMax: null,
+  conditionMin: null,
 };
 
 export function isFilterActive(filters: FilterState): boolean {
@@ -23,7 +26,10 @@ export function isFilterActive(filters: FilterState): boolean {
     filters.titleStatuses.length > 0 ||
     filters.provinces.length > 0 ||
     filters.priceMin !== null ||
-    filters.priceMax !== null
+    filters.priceMax !== null ||
+    filters.yearMin !== null ||
+    filters.yearMax !== null ||
+    filters.conditionMin !== null
   );
 }
 
@@ -51,6 +57,9 @@ export function filterVehicles(
     const effectivePrice = v.current_bid ?? v.starting_bid;
     if (filters.priceMin !== null && effectivePrice < filters.priceMin) return false;
     if (filters.priceMax !== null && effectivePrice > filters.priceMax) return false;
+    if (filters.yearMin !== null && v.year < filters.yearMin) return false;
+    if (filters.yearMax !== null && v.year > filters.yearMax) return false;
+    if (filters.conditionMin !== null && v.condition_grade < filters.conditionMin) return false;
     return true;
   });
 }

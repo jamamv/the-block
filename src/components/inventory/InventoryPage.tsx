@@ -28,6 +28,7 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
 
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [sortKey, setSortKey] = useState<SortKey>('bid_desc');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchConfirmed, setSearchConfirmed] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -72,7 +73,9 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
     filters.Brands.length +
     filters.bodyStyles.length +
     filters.titleStatuses.length +
-    filters.provinces.length;
+    filters.provinces.length +
+    (filters.yearMin !== null || filters.yearMax !== null ? 1 : 0) +
+    (filters.conditionMin !== null ? 1 : 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -146,12 +149,14 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
             total={vehicles.length}
             sortKey={sortKey}
             onSortChange={setSortKey}
+            viewMode={viewMode}
+            onViewChange={setViewMode}
           />
 
           {display.length === 0 ? (
             <EmptyState onClear={handleClearFilters} />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div className={viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4'}>
               {display.map((vehicle) => (
                 <VehicleCard
                   key={vehicle.id}
@@ -162,6 +167,7 @@ export function InventoryPage({ bidStateMap, watchlist, toggleWatch }: Inventory
                   isInCompare={compareIds.includes(vehicle.id)}
                   canAddToCompare={canAdd(vehicle.id)}
                   onToggleCompare={toggleCompare}
+                  viewMode={viewMode}
                 />
               ))}
             </div>

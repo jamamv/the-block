@@ -14,6 +14,7 @@ interface VehicleCardProps {
   isInCompare: boolean;
   canAddToCompare: boolean;
   onToggleCompare: (id: string) => void;
+  viewMode?: 'grid' | 'list';
 }
 
 const PRICE_BADGE: Record<PriceLabel, { textKey: 'sort.bid_desc' | 'sort.bid_asc'; prefix: string; className: string }> = {
@@ -42,7 +43,7 @@ function ConditionBar({ grade }: { grade: number }) {
   );
 }
 
-export function VehicleCard({ vehicle, bidState, isWatched, onToggleWatch, isInCompare, canAddToCompare, onToggleCompare }: VehicleCardProps) {
+export function VehicleCard({ vehicle, bidState, isWatched, onToggleWatch, isInCompare, canAddToCompare, onToggleCompare, viewMode = 'grid' }: VehicleCardProps) {
   const { fmt, t } = useSettings();
   const currentBid = bidState?.current_bid ?? vehicle.current_bid;
   const bidCount = bidState?.bid_count ?? vehicle.bid_count;
@@ -50,6 +51,93 @@ export function VehicleCard({ vehicle, bidState, isWatched, onToggleWatch, isInC
   const priceLabel = getPriceLabel({ ...vehicle, current_bid: currentBid ?? null });
   const priceBadge = priceLabel && priceLabel !== 'fair-price' ? PRICE_BADGE[priceLabel] : null;
   const priceBadgeText = priceLabel && priceLabel !== 'fair-price' ? PRICE_BADGE_TEXT[priceLabel] : null;
+
+  if (viewMode === 'list') {
+    return (
+      <div className={`group flex bg-white dark:bg-slate-800 rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all duration-150 ${isInCompare ? 'border-blue-500 ring-2 ring-blue-400' : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600'}`}>
+        <Link to={`/vehicle/${vehicle.id}`} className="flex-shrink-0 w-32 sm:w-44 relative overflow-hidden bg-slate-100 dark:bg-slate-900">
+          <img
+            src={vehicle.images[0]}
+            alt={`${vehicle.year} ${vehicle.Brand} ${vehicle.model}`}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            loading="lazy"
+          />
+          <div className="absolute bottom-2 left-2">
+            <AuctionStatusBadge auctionStart={vehicle.auction_start} showCountdown={false} />
+          </div>
+        </Link>
+
+        <div className="flex-1 p-3 sm:p-4 min-w-0 flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-2">
+            <Link to={`/vehicle/${vehicle.id}`} className="min-w-0">
+              <h3 className="font-semibold text-slate-900 dark:text-white text-sm leading-snug group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors truncate">
+                {vehicle.Brand} {vehicle.model} <span className="text-slate-400 dark:text-slate-500">({vehicle.year})</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex gap-2 flex-wrap">
+                <span>{vehicle.trim}</span>
+                <span>·</span>
+                <span>{formatOdometer(vehicle.odometer_km)}</span>
+                <span className="hidden sm:inline">· {vehicle.title_status}</span>
+              </p>
+            </Link>
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleWatch(vehicle.id); }}
+              className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all ${isWatched ? 'text-red-500' : 'text-slate-300 dark:text-slate-600 hover:text-red-400'}`}
+              aria-label={isWatched ? t('card.remove_watch') : t('card.save_watch')}
+            >
+              <svg className="w-4 h-4" fill={isWatched ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          </div>
+
+          <ConditionBar grade={vehicle.condition_grade} />
+
+          <div className="flex items-end justify-between gap-2 mt-auto pt-2 border-t border-slate-100 dark:border-slate-700">
+            <div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {currentBid != null
+                  ? <>{bidCount} {bidCount === 1 ? t('misc.bid') : t('misc.bids')}{reserveMet && <span className="ml-1 text-emerald-600 dark:text-emerald-400 font-medium">· {t('misc.reserve_met')}</span>}</>
+                  : t('card.starting_at')
+                }
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                  {fmt(currentBid ?? vehicle.starting_bid)}
+                </p>
+                {priceBadge && priceBadgeText && (
+                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${priceBadge.className}`}>
+                    {priceBadgeText}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {vehicle.buy_now_price !== null && (
+                <div className="text-right hidden sm:block">
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{t('bid.buy_now')}</p>
+                  <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">{fmt(vehicle.buy_now_price)}</p>
+                </div>
+              )}
+              <button
+                onClick={(e) => { e.stopPropagation(); onToggleCompare(vehicle.id); }}
+                disabled={!isInCompare && !canAddToCompare}
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                  isInCompare
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : canAddToCompare
+                    ? 'text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-600 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                    : 'text-slate-300 dark:text-slate-600 border-slate-100 dark:border-slate-700 cursor-not-allowed'
+                }`}
+              >
+                {isInCompare ? t('misc.selected') : t('misc.compare')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`group flex flex-col bg-white dark:bg-slate-800 rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all duration-150 ${isInCompare ? 'border-blue-500 ring-2 ring-blue-400' : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600'}`}>

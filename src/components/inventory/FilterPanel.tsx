@@ -151,6 +151,20 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
     onChange({ ...filters, priceMax: val });
   }
 
+  function setYearMin(raw: string) {
+    const val = raw === '' ? null : Number(raw);
+    onChange({ ...filters, yearMin: val });
+  }
+
+  function setYearMax(raw: string) {
+    const val = raw === '' ? null : Number(raw);
+    onChange({ ...filters, yearMax: val });
+  }
+
+  function setConditionMin(val: number) {
+    onChange({ ...filters, conditionMin: filters.conditionMin === val ? null : val });
+  }
+
   return (
     <div className="space-y-5">
 
@@ -222,6 +236,77 @@ export function FilterPanel({ filters, onChange }: FilterPanelProps) {
             {t('filter.clear_range')}
           </button>
         )}
+      </div>
+
+      <div className="border-t border-slate-100 dark:border-slate-700" />
+
+      {/* Year Range */}
+      <div>
+        <SectionHeader title={t('filter.year')} />
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={2000}
+            max={2030}
+            placeholder={t('filter.year_from')}
+            value={filters.yearMin ?? ''}
+            onChange={(e) => setYearMin(e.target.value)}
+            className="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <span className="text-slate-300 dark:text-slate-600 text-sm flex-shrink-0">—</span>
+          <input
+            type="number"
+            min={2000}
+            max={2030}
+            placeholder={t('filter.year_to')}
+            value={filters.yearMax ?? ''}
+            onChange={(e) => setYearMax(e.target.value)}
+            className="w-full px-2.5 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+        {(filters.yearMin !== null || filters.yearMax !== null) && (
+          <button
+            onClick={() => onChange({ ...filters, yearMin: null, yearMax: null })}
+            className="mt-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+          >
+            {t('filter.clear_range')}
+          </button>
+        )}
+      </div>
+
+      <div className="border-t border-slate-100 dark:border-slate-700" />
+
+      {/* Condition */}
+      <div>
+        <SectionHeader title={t('filter.condition')} />
+        <div className="flex flex-col gap-1.5">
+          {([2, 3, 4] as const).map((grade) => {
+            const active = filters.conditionMin === grade;
+            const label = grade === 2 ? t('filter.condition_fair') : grade === 3 ? t('filter.condition_good') : t('filter.condition_excellent');
+            const dot = grade === 4 ? 'bg-emerald-500' : grade === 3 ? 'bg-amber-400' : 'bg-red-400';
+            const colors = grade === 4
+              ? { active: 'bg-emerald-500 text-white border-emerald-500', inactive: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/30' }
+              : grade === 3
+              ? { active: 'bg-amber-500 text-white border-amber-500', inactive: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30' }
+              : { active: 'bg-red-500 text-white border-red-500', inactive: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30' };
+            return (
+              <button
+                key={grade}
+                onClick={() => setConditionMin(grade)}
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${active ? colors.active : colors.inactive}`}
+              >
+                {active ? (
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
+                )}
+                <span className="flex-1 text-left">{label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div className="border-t border-slate-100 dark:border-slate-700" />

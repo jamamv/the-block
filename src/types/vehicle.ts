@@ -57,6 +57,9 @@ export interface FilterState {
   provinces: string[];
   priceMin: number | null;
   priceMax: number | null;
+  yearMin: number | null;
+  yearMax: number | null;
+  conditionMin: number | null;
 }
 
 export type SortKey =
