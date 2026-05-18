@@ -56,18 +56,47 @@ Key responsibilities:
 
 - Creates the app-wide bid, auth, and watchlist state.
 - Wraps the app in `SettingsProvider` and `BrowserRouter`.
-- Defines the desktop header, mobile bottom navigation, footer, and routes.
+- Composes layout components (`Header`, `BottomNav`) and route components.
 - Keeps saved and bids navigation state tied to the current URL.
-- Shows notification, settings, auth, and live-auction controls in the header.
 
 Important internal pieces:
 
-- `useHasLiveAuctions()` checks whether any auction is currently live or ending soon.
-- `SettingsPopover` lets users toggle dark mode, CAD/USD, and English/French.
-- `UserMenu` shows account initials and logout.
-- `Header` owns desktop navigation, saved count, bid count, live badge, notification bell, settings, and sign-in/account controls.
-- `BottomNav` provides mobile navigation for Inventory, Saved, Bids, and List Car.
 - `AppShell` binds route components to shared state and callbacks.
+- Layout components live in `src/components/layout/` and are imported here.
+
+---
+
+## Layout Components
+
+### `src/components/layout/Header.tsx`
+
+Desktop header and navigation.
+
+Responsibilities:
+
+- Brand logo and nav links (Inventory, Saved count, Bids count, List Car).
+- Live auction badge (pulses when any auction is active or ending soon).
+- Notification bell via `NotificationBell`.
+- Settings popover via `SettingsPopover`.
+- Auth controls via `UserMenu`.
+
+Contains `useHasLiveAuctions()` — a local hook that checks whether any vehicle is currently live or ending soon.
+
+### `src/components/layout/BottomNav.tsx`
+
+Mobile bottom navigation bar with four tabs: Inventory, Saved, Bids, and List Car.
+
+### `src/components/layout/SettingsPopover.tsx`
+
+Dropdown for dark mode, CAD/USD currency, and English/French locale toggles.
+
+### `src/components/layout/UserMenu.tsx`
+
+Shows the logged-in user's initials as an avatar. Opens a small menu with a logout action.
+
+### `src/components/layout/LoadingScreen.tsx`
+
+Full-screen loading state shown while auth is initializing.
 
 ---
 
@@ -799,10 +828,6 @@ Main project README for reviewers. It explains the product, setup, features, arc
 ### `WALKTHROUGH.md`
 
 Explains how to prepare for the 45-60 minute walkthrough conversation.
-
-### `SUBMISSION.md`
-
-Original challenge submission template.
 
 ### `CODEBASE_GUIDE.md`
 

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import type { Vehicle, BidState } from '../../types/vehicle.ts';
 import type { AuthUser } from '../../hooks/useAuth.ts';
 import type { AuctionStatus } from '../../hooks/useAuctionStatus.ts';
-import { validateBid, minimumBid } from '../../utils/bid.ts';
+import { minimumBid } from '../../utils/bid.ts';
 import { ReserveBadge } from '../ui/Badge.tsx';
 import { VERIFIED_DEALERS } from '../../data/vehicles.ts';
 import { useSettings } from '../../contexts/SettingsContext.tsx';
@@ -22,8 +22,10 @@ interface BidPanelProps {
 type BidStep = 'idle' | 'confirm' | 'success' | 'error';
 type BuyNowStep = 'idle' | 'confirm' | 'success';
 
+const USD_RATE = 0.73;
+
 export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceBid, onBuyNow, onRetractBid, user }: BidPanelProps) {
-  const { fmt, t } = useSettings();
+  const { fmt, t, currency } = useSettings();
   const location = useLocation();
   const isVerified = VERIFIED_DEALERS.has(vehicle.selling_dealership);
   const boughtNow = bidState?.bought_now === true;
@@ -33,6 +35,7 @@ export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceB
 
   const [inputValue, setInputValue] = useState('');
   const [pendingAmount, setPendingAmount] = useState(0);
+  const [pendingDisplayAmount, setPendingDisplayAmount] = useState(0);
   const [bidStep, setBidStep] = useState<BidStep>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [buyNowStep, setBuyNowStep] = useState<BuyNowStep>('idle');
@@ -42,10 +45,20 @@ export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceB
 
   function handleBidSubmit(e: { preventDefault(): void }) {
     e.preventDefault();
-    const amount = Number(inputValue.replace(/[^0-9]/g, ''));
-    const err = validateBid(amount, currentBid ?? 0, t);
-    if (err) { setErrorMsg(err); setBidStep('error'); return; }
-    setPendingAmount(amount);
+    const displayAmount = Number(inputValue.replace(/[^0-9]/g, ''));
+    const amountCAD = currency === 'USD' ? Math.round(displayAmount / USD_RATE) : displayAmount;
+    if (isNaN(amountCAD) || amountCAD <= 0) {
+      setErrorMsg(t('bid.err_invalid'));
+      setBidStep('error');
+      return;
+    }
+    if (amountCAD < minimumBid(currentBid ?? 0)) {
+      setErrorMsg(t('bid.err_minimum', { amount: fmt(minimumBid(currentBid ?? 0)) }));
+      setBidStep('error');
+      return;
+    }
+    setPendingDisplayAmount(displayAmount);
+    setPendingAmount(amountCAD);
     setBidStep('confirm');
   }
 
@@ -182,7 +195,7 @@ export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceB
           <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4 space-y-3">
             <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">{t('bid.confirm_bid_title')}</p>
             <p className="text-sm text-amber-800 dark:text-amber-400">
-              {t('bid.place_amount', { amount: fmt(pendingAmount) })}
+              {t('bid.place_amount', { amount: '$' + pendingDisplayAmount.toLocaleString('en-CA') })}
             </p>
             <div className="flex gap-2">
               <button onClick={confirmBid} className="flex-1 py-2 rounded-lg bg-blue-600 text-white font-semibold text-sm hover:bg-blue-700 transition-colors">
@@ -195,7 +208,7 @@ export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceB
           </div>
         ) : bidStep === 'success' ? (
           <p className="text-sm text-emerald-600 dark:text-emerald-400 text-center font-medium py-2">
-            {t('bid.placed', { amount: fmt(pendingAmount) })}
+            {t('bid.placed', { amount: '$' + pendingDisplayAmount.toLocaleString('en-CA') })}
           </p>
         ) : (
           <form onSubmit={handleBidSubmit} className="space-y-3">
@@ -209,7 +222,7 @@ export function BidPanel({ vehicle, bidState, auctionStatus, countdown, onPlaceB
                   pattern="[0-9,]*"
                   value={inputValue}
                   onChange={(e) => { setInputValue(e.target.value); setBidStep('idle'); setErrorMsg(''); }}
-                  placeholder={minBid.toLocaleString('en-CA')}
+                  placeholder={fmt(minBid).replace(/[^0-9,]/g, '')}
                   className="flex-1 px-2 py-2.5 text-sm outline-none bg-transparent text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600 placeholder:font-normal"
                 />
               </div>
